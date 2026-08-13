@@ -1,0 +1,14 @@
+const nutrients=[
+ {name:'Protein',group:'Macronutrient',role:'Provides amino acids used to build and maintain body proteins.',sources:'Fish, beans, lentils, eggs, dairy, nuts, seeds, meat',body:'Muscle and other tissues · enzymes · hormones'},
+ {name:'Carbohydrates',group:'Macronutrient',role:'A major source of energy; carbohydrate is broken down into smaller sugars during digestion.',sources:'Whole grains, fruit, vegetables, legumes, breads and other grain foods',body:'Digestive tract · blood glucose · energy metabolism'},
+ {name:'Dietary fiber',group:'Carbohydrate component',role:'A group of carbohydrates that are not fully digested in the small intestine and can affect bowel function and the gut environment.',sources:'Whole grains, beans, vegetables, fruit, nuts and seeds',body:'Small intestine · large intestine · gut microbiome'},
+ {name:'Unsaturated fats',group:'Macronutrient',role:'Provide energy and are important components of cell membranes.',sources:'Fish, nuts, seeds, avocado and plant oils',body:'Cell membranes · energy metabolism'},
+ {name:'Iron',group:'Mineral',role:'Needed for hemoglobin and other proteins involved in oxygen transport and metabolism.',sources:'Meat, seafood, beans, lentils, fortified grains, spinach',body:'Blood · muscles · cellular metabolism'},
+ {name:'Calcium',group:'Mineral',role:'Important for bones and teeth and for normal muscle, nerve, and cellular functions.',sources:'Dairy foods, fortified alternatives, some fish, leafy greens',body:'Bones · muscles · nerves'},
+ {name:'Vitamin C',group:'Vitamin',role:'Supports collagen formation and helps protect cells from oxidative damage.',sources:'Citrus, peppers, strawberries, broccoli and other fruits and vegetables',body:'Connective tissue · immune system · antioxidant defense'},
+ {name:'Folate',group:'Vitamin B',role:'Needed for DNA synthesis and cell division.',sources:'Leafy greens, beans, peas, citrus, fortified grain foods',body:'Rapidly dividing cells · blood formation'},
+ {name:'Potassium',group:'Mineral',role:'An essential mineral involved in normal cellular, nerve, and muscle function.',sources:'Potatoes, beans, fruit, vegetables, dairy and fish',body:'Cells · nerves · muscles'},
+ {name:'Omega-3 fatty acids',group:'Fatty acids',role:'A family of polyunsaturated fatty acids with structural and signaling roles; EPA and DHA are found in seafood.',sources:'Fatty fish, seafood, flaxseed, chia and walnuts',body:'Cell membranes · signaling · cardiovascular research'}
+];
+const grid=document.getElementById('nutrientGrid');
+grid.innerHTML=nutrients.map(n=>`<article class="nutrient-card"><span class="nutrient-group">${n.group}</span><h2>${n.name}</h2><p>${n.role}</p><div><b>Food sources</b><span>${n.sources}</span></div><div><b>Body connections</b><span>${n.body}</span></div></article>`).join('');
