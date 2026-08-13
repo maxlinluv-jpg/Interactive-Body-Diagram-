@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive anatomical body model.">
+  <title>Explore the Body · BodyLab</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="body.css">
+</head>
+<body class="body-page">
+  <header class="nav">
+    <a class="brand" href="index.html"><span class="brand-mark">◎</span><span>Body<span class="brand-muted">Lab</span></span></a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a class="active" href="body.html">Explore</a>
+      <a href="index.html#nutrition">Nutrition</a>
+      <a href="index.html#about">About</a>
+    </nav>
+    <a class="icon-button help-link" href="index.html" aria-label="Back to home">×</a>
+  </header>
+
+  <main class="anatomy-main">
+    <section class="anatomy-header">
+      <div>
+        <p class="eyebrow">INTERACTIVE ANATOMY</p>
+        <h1>Explore the human body.</h1>
+        <p>Choose a system to see where it is located and how nutrition connects to it.</p>
+      </div>
+      <div class="model-status"><i></i> Interactive model</div>
+    </section>
+
+    <section class="anatomy-layout">
+      <aside class="anatomy-controls glass-card">
+        <p class="mini-heading">BODY SYSTEMS</p>
+        <button class="system-option active" data-organ="Brain"><span class="dot brain"></span><span><b>Brain</b><small>Cognition & mood</small></span></button>
+        <button class="system-option" data-organ="Heart"><span class="dot heart"></span><span><b>Heart</b><small>Cardiovascular</small></span></button>
+        <button class="system-option" data-organ="Lungs"><span class="dot lungs"></span><span><b>Lungs</b><small>Gas exchange</small></span></button>
+        <button class="system-option" data-organ="Liver"><span class="dot liver"></span><span><b>Liver</b><small>Metabolism</small></span></button>
+        <button class="system-option" data-organ="Gut"><span class="dot gut"></span><span><b>Digestive system</b><small>Digestion & absorption</small></span></button>
+        <button class="system-option" data-organ="Skin"><span class="dot skin"></span><span><b>Skin</b><small>Protective barrier</small></span></button>
+      </aside>
+
+      <section class="anatomy-view glass-card">
+        <div class="anatomy-topline"><span>Anterior view</span><span>Not to scale</span></div>
+        <div class="anatomy-canvas">
+          <div class="anatomy-aura"></div>
+          <svg class="anatomy-svg" viewBox="0 0 520 760" role="img" aria-label="Interactive anatomical illustration">
+            <defs>
+              <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2c4ad"/><stop offset="1" stop-color="#b98f79"/></linearGradient>
+              <linearGradient id="torsoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9b7a2"/><stop offset="1" stop-color="#a87967"/></linearGradient>
+              <filter id="softShadow"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-opacity=".14"/></filter>
+            </defs>
+            <!-- outer human silhouette -->
+            <g class="silhouette" filter="url(#softShadow)">
+              <circle cx="260" cy="72" r="52" fill="url(#skinGrad)"/>
+              <path d="M226 119 Q260 135 294 119 L304 150 Q350 165 372 225 L350 355 Q335 382 325 400 L314 528 L290 528 L270 386 L250 386 L230 528 L206 528 L195 400 Q185 380 170 355 L148 225 Q170 165 216 150Z" fill="url(#torsoGrad)"/>
+              <path d="M169 168 Q137 190 115 244 L74 355 Q70 368 84 376 L98 381 Q109 382 116 370 L162 285 L188 220Z" fill="url(#skinGrad)"/>
+              <path d="M351 168 Q383 190 405 244 L446 355 Q450 368 436 376 L422 381 Q411 382 404 370 L358 285 L332 220Z" fill="url(#skinGrad)"/>
+              <path d="M205 520 L231 520 L226 707 Q224 731 205 731 L188 731 Q178 728 181 711 L195 602Z" fill="url(#skinGrad)"/>
+              <path d="M289 520 L315 520 L325 602 L339 711 Q342 728 332 731 L315 731 Q296 731 294 707Z" fill="url(#skinGrad)"/>
+            </g>
+
+            <!-- organs, placed anatomically within the silhouette -->
+            <button class="svg-organ brain-organ" data-organ="Brain" aria-label="Brain">
+              <path d="M232 61 C226 43 246 30 261 41 C277 30 296 46 288 62 C300 74 287 91 271 87 C259 96 243 88 244 77 C232 78 224 70 232 61Z"/>
+            </button>
+            <button class="svg-organ lungs-organ" data-organ="Lungs" aria-label="Lungs">
+              <path d="M254 184 C231 167 207 177 202 211 L203 262 C207 277 227 272 245 249 L258 219Z"/>
+              <path d="M266 184 C289 167 313 177 318 211 L317 262 C313 277 293 272 275 249 L262 219Z"/>
+            </button>
+            <button class="svg-organ heart-organ" data-organ="Heart" aria-label="Heart">
+              <path d="M259 239 C240 215 214 229 220 250 C227 274 259 292 259 292 C259 292 291 274 298 250 C304 229 278 215 259 239Z"/>
+            </button>
+            <button class="svg-organ liver-organ" data-organ="Liver" aria-label="Liver">
+              <path d="M238 292 C265 277 305 280 319 299 C311 323 280 337 238 325 C222 320 221 304 238 292Z"/>
+            </button>
+            <button class="svg-organ gut-organ" data-organ="Gut" aria-label="Digestive system">
+              <path d="M229 337 C249 324 274 328 290 340 C305 352 299 366 286 371 C303 380 296 395 279 395 C262 395 254 381 246 389 C233 403 214 393 220 378 C224 367 240 367 229 356 C218 346 218 341 229 337Z"/>
+            </button>
+            <button class="svg-organ skin-organ" data-organ="Skin" aria-label="Skin">
+              <path d="M148 170 Q130 220 112 273 L88 348 M372 170 Q390 220 408 273 L432 348"/>
+            </button>
+          </svg>
+          <div class="canvas-label">Click an organ</div>
+        </div>
+      </section>
+
+      <aside class="anatomy-details glass-card">
+        <p class="eyebrow">SELECTED SYSTEM</p>
+        <div class="detail-icon" id="detailIcon">◉</div>
+        <h2 id="detailTitle">Brain</h2>
+        <p id="detailDescription">Cognition, mood, and neurotransmitter activity.</p>
+        <div class="health-row"><span>Health score</span><strong id="healthScore">82</strong></div>
+        <div class="progress"><span id="healthBar" style="width:82%"></span></div>
+        <div class="detail-divider"></div>
+        <p class="mini-heading">NUTRITION CONNECTIONS</p>
+        <div class="tag-list" id="nutritionTags"><span>Omega-3</span><span>Antioxidants</span><span>Protein</span></div>
+        <p class="location-note" id="locationNote">Located within the skull, protected by the cranium.</p>
+      </aside>
+    </section>
+  </main>
+  <script src="body.js"></script>
+</body>
+</html>
