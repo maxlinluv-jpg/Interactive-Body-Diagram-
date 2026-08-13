@@ -1,0 +1,29 @@
+.body-page { min-height:100vh; }
+.anatomy-main { width:min(1600px,94vw); margin:auto; padding:38px 0 55px; }
+.anatomy-header { display:flex; justify-content:space-between; align-items:end; gap:30px; padding:20px 2vw 30px; }
+.anatomy-header h1 { margin:0; font-size:clamp(38px,4.5vw,64px); letter-spacing:-.055em; line-height:1.02; }
+.anatomy-header>div:first-child>p:last-child { margin:16px 0 0; color:var(--muted); font-size:16px; }
+.model-status { padding:10px 14px; background:#fff; border-radius:999px; box-shadow:0 8px 25px rgba(0,0,0,.06); color:var(--muted); font-size:12px; white-space:nowrap; }
+.model-status i { display:inline-block; width:7px; height:7px; background:#35c759; border-radius:50%; margin-right:7px; }
+.anatomy-layout { display:grid; grid-template-columns:235px minmax(560px,1fr) 290px; gap:18px; min-height:800px; }
+.anatomy-controls { padding:22px 15px; align-self:start; }
+.anatomy-controls .mini-heading { padding:0 10px; margin:0 0 10px; }
+.anatomy-view { min-height:800px; overflow:hidden; position:relative; }
+.anatomy-topline { height:54px; padding:0 22px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:12px; }
+.anatomy-canvas { min-height:746px; position:relative; display:grid; place-items:center; overflow:hidden; background:radial-gradient(circle at 50% 44%,rgba(255,255,255,1),rgba(244,245,248,.75)); }
+.anatomy-aura { position:absolute; width:min(620px,75%); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,rgba(0,113,227,.075),transparent 68%); }
+.anatomy-svg { width:min(520px,76%); height:auto; max-height:700px; overflow:visible; z-index:1; }
+.silhouette { opacity:.94; }
+.svg-organ { fill:none; stroke:#fff; stroke-width:3; cursor:pointer; transition:transform .22s, filter .22s, opacity .22s; transform-box:fill-box; transform-origin:center; filter:drop-shadow(0 4px 7px rgba(0,0,0,.18)); }
+.svg-organ path { vector-effect:non-scaling-stroke; }
+.brain-organ path { fill:#8e75d8; }.lungs-organ path{fill:#c9978b}.heart-organ path{fill:#e65d72}.liver-organ path{fill:#a9673d}.gut-organ path{fill:#63ae78}.skin-organ path{fill:none;stroke:#c18e73;stroke-width:13;opacity:.72}
+.svg-organ:hover,.svg-organ.selected { transform:scale(1.08); filter:drop-shadow(0 7px 14px rgba(0,0,0,.25)); }
+.svg-organ.selected { stroke-width:5; }
+.canvas-label { position:absolute; bottom:24px; color:#8a8a90; font-size:11px; z-index:2; }
+.anatomy-details { align-self:start; padding:25px; min-height:420px; }
+.anatomy-details .detail-icon { width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:#fff;background:#8e75d8;font-weight:700;margin-bottom:17px; }
+.anatomy-details h2 { margin:0 0 7px; font-size:29px; letter-spacing:-.04em; }.anatomy-details>p:not(.eyebrow):not(.mini-heading):not(.location-note){color:var(--muted);font-size:13px;line-height:1.55;}
+.location-note { margin-top:24px; padding:13px 14px; background:#f2f2f5; border-radius:13px; color:#66666b; font-size:11px; line-height:1.5; }
+.help-link { display:grid; place-items:center; }
+@media(max-width:1150px){.anatomy-layout{grid-template-columns:200px minmax(430px,1fr)}.anatomy-details{grid-column:1/-1}.anatomy-view{min-height:720px}.anatomy-canvas{min-height:666px}}
+@media(max-width:760px){.anatomy-main{width:94vw;padding-top:20px}.anatomy-header{display:block}.model-status{display:inline-block;margin-top:20px}.anatomy-layout{display:block}.anatomy-controls{margin-bottom:15px}.anatomy-view{min-height:600px}.anatomy-canvas{min-height:546px}.anatomy-svg{width:85%;}.anatomy-details{margin-top:15px}.anatomy-controls .system-option{display:inline-flex;width:49%;vertical-align:top}}
