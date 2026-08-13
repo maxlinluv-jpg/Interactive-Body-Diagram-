@@ -1,13 +1,28 @@
 (() => {
   const root = document.getElementById('threeRoot');
   if (!root) return;
+
+  /* A faceted, matte finish gives the model a modern architectural / home-design feel. */
+  if (typeof organMats !== 'undefined') {
+    Object.values(organMats).forEach(m => {
+      m.flatShading = true;
+      m.roughness = 0.74;
+      m.metalness = 0.01;
+      m.needsUpdate = true;
+    });
+  }
+  if (typeof skinMat !== 'undefined') {
+    skinMat.flatShading = true;
+    skinMat.roughness = 0.86;
+    skinMat.opacity = 0.15;
+    skinMat.needsUpdate = true;
+  }
+
   const tip = document.createElement('div');
   tip.className = 'organ-hover-tip';
   tip.innerHTML = '<strong>Explore the anatomy</strong><span>Move over an organ</span>';
   root.appendChild(tip);
 
-  // The 3D scene is owned by simulator.js. This helper provides a visual hover
-  // guide without changing the existing click/drag controls.
   const regions = [
     ['Brain', .50, .18, .13, .10],
     ['Lungs', .50, .36, .25, .20],
@@ -33,7 +48,7 @@
       return;
     }
     tip.querySelector('strong').textContent = found;
-    tip.querySelector('span').textContent = 'Move or click to explore';
+    tip.querySelector('span').textContent = 'Click to explore';
     tip.style.left = `${e.clientX-r.left+16}px`;
     tip.style.top = `${e.clientY-r.top+16}px`;
     tip.classList.add('show');
