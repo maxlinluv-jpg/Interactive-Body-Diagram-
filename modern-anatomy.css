@@ -1,0 +1,12 @@
+/* Modern architectural / home-design inspired anatomy studio */
+.model-stage-3d{background:radial-gradient(circle at 50% 35%,#24303a 0,#151b21 48%,#0b0f13 100%)!important;box-shadow:inset 0 0 90px rgba(0,0,0,.42)}
+.three-vignette{background:radial-gradient(circle,transparent 42%,rgba(0,0,0,.38) 100%)!important;pointer-events:none}
+.model-stage-3d:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.035),transparent 34%,rgba(255,255,255,.018) 67%,transparent);pointer-events:none}
+.three-help{color:#cbd3dc!important;background:rgba(18,23,28,.72)!important;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)}
+.three-controls{background:#11171c!important;color:#d8dfe5!important;border-color:rgba(255,255,255,.08)!important}
+.three-controls button,.three-controls label{background:#1d252c!important;color:#d8dfe5!important;border-color:rgba(255,255,255,.08)!important}
+.anatomy-tooltip{position:absolute;z-index:30;display:none;pointer-events:none;min-width:120px;padding:9px 12px;border-radius:13px;background:rgba(17,22,27,.9);color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(16px);font-size:11px;font-weight:700;letter-spacing:.01em;transform:translate(14px,14px)}
+.anatomy-tooltip small{display:block;margin-top:3px;color:#aeb8c1;font-weight:500;font-size:9px}
+.model-stage-3d .three-root canvas{filter:saturate(.92) contrast(1.04)}
+.model-stage-3d .three-root{position:absolute;inset:0}
+@media(max-width:760px){.anatomy-tooltip{font-size:10px}}
