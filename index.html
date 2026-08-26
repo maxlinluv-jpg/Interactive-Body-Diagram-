@@ -1,41 +1,118 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diet//Body — Physiology Lab</title><style>
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#02040a;color:#eef6ff;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}canvas{display:block}.hud{position:fixed;inset:0;pointer-events:none}.glass{background:linear-gradient(135deg,rgba(12,19,31,.82),rgba(4,9,17,.58));border:1px solid rgba(160,210,255,.16);box-shadow:0 20px 70px #0009,inset 0 1px #ffffff0c;backdrop-filter:blur(24px);border-radius:22px}.top{position:absolute;top:18px;left:20px;right:20px;height:64px;padding:0 22px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:15px;font-weight:850;letter-spacing:.2em}.brand em{color:#64ddff;font-style:normal}.status{font-size:10px;letter-spacing:.15em;color:#8192aa}.status b{color:#65f2aa}.left,.right{position:absolute;top:98px;width:292px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}.left{left:20px}.right{right:20px}.panel{padding:17px}.kicker{font-size:9px;letter-spacing:.18em;color:#70829b;text-transform:uppercase;margin-bottom:14px}.hero{font-size:22px;font-weight:720;line-height:1.08;margin-bottom:6px}.sub{font-size:10px;color:#718198;line-height:1.5}.metrics{display:grid;gap:12px}.m{display:grid;grid-template-columns:1fr auto;gap:6px}.m span{font-size:10px;color:#9ba9bc}.m strong{font-size:10px}.bar{height:5px;background:#121c2b;border-radius:10px;grid-column:1/-1;overflow:hidden}.bar i{display:block;height:100%;border-radius:10px;transition:width .5s}.foods{display:grid;grid-template-columns:1fr 1fr;gap:8px}.food{padding:11px;border-radius:14px;border:1px solid #203049;background:#0b1320;color:#eef6ff;text-align:left;cursor:pointer;transition:.2s}.food:hover{transform:translateY(-3px);border-color:#55dfff;box-shadow:0 8px 30px #42dfff18}.food .e{font-size:22px}.food b{display:block;font-size:10px;margin-top:5px}.food small{font-size:8px;color:#708098}.modern{box-shadow:inset 2px 0 #ff5d79}.trad{box-shadow:inset 2px 0 #59e5a0}.buttons{display:flex;gap:6px;flex-wrap:wrap}.btn{border:1px solid #24364d;background:#0a1320;color:#dbe8f7;border-radius:10px;padding:8px 10px;font-size:9px;cursor:pointer}.btn:hover,.btn.on{border-color:#5cddff;background:#0b2230;color:#9cecff}.feed{height:125px;overflow:hidden}.event{font-size:9px;color:#718198;padding:6px 0;border-bottom:1px solid #ffffff08}.event b{color:#dce8f6}.tag{display:inline-block;font-size:8px;padding:3px 6px;border-radius:99px;background:#09202b;color:#72ddff;margin-bottom:8px}.hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.18em;color:#687a92}.focus{position:absolute;top:96px;left:50%;transform:translateX(-50%);font-size:10px;color:#8ba0ba;letter-spacing:.1em}.toast{position:absolute;top:82px;left:50%;transform:translate(-50%,-15px);padding:9px 14px;border-radius:12px;background:#07111cdd;border:1px solid #52dfff66;font-size:10px;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
-</style></head><body><div id="scene"></div><div class="hud"><header class="top glass"><div class="brand">DIET<em>//</em>BODY</div><div class="status"><b>● LIVE</b> &nbsp; PHYSIOLOGY VISUALIZATION &nbsp; / &nbsp; EDUCATIONAL MODEL</div></header><aside class="left"><section class="panel glass"><div class="tag">INTERACTIVE 3D MODEL</div><div class="hero">See what food<br>does inside you.</div><div class="sub">Explore the body, introduce foods, and watch a simplified physiological response unfold in real time.</div></section><section class="panel glass"><div class="kicker">System health</div><div id="metrics" class="metrics"></div></section><section class="panel glass"><div class="kicker">Food laboratory</div><div id="foods" class="foods"></div></section></aside><aside class="right"><section class="panel glass"><div class="kicker">Simulation time</div><div class="buttons"><button class="btn on" data-speed="1">1×</button><button class="btn" data-speed="30">30×</button><button class="btn" data-speed="300">5 min/s</button><button class="btn" data-speed="1800">30 min/s</button></div><div style="height:8px"></div><button id="reset" class="btn" style="width:100%">↺ Reset laboratory</button></section><section class="panel glass"><div class="kicker">Physiology feed</div><div id="feed" class="feed"></div></section><section class="panel glass"><div class="kicker">Explore</div><div class="sub">Drag to rotate · scroll to zoom<br>Click an organ to isolate it<br>Click empty space to restore the body</div></section></aside><div class="focus" id="focus">FULL BODY · INTERNAL ANATOMY</div><div class="hint">DRAG TO ROTATE &nbsp; · &nbsp; SCROLL TO ZOOM &nbsp; · &nbsp; CLICK AN ORGAN</div><div id="toast" class="toast"></div></div>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diet//Body — 3D Physiology Lab</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02040a;color:#eef6ff;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}#scene{position:fixed;inset:0}canvas{display:block}.hud{position:fixed;inset:0;pointer-events:none}.glass{background:rgba(8,14,25,.78);border:1px solid rgba(150,210,255,.16);box-shadow:0 20px 70px rgba(0,0,0,.4);backdrop-filter:blur(20px);border-radius:20px}.top{position:absolute;top:18px;left:20px;right:20px;height:62px;padding:0 22px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:15px;font-weight:800;letter-spacing:.2em}.brand span{color:#64ddff}.status{font-size:9px;letter-spacing:.12em;color:#8090a7}.status b{color:#64e9a4}.left,.right{position:absolute;top:96px;width:285px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}.left{left:20px}.right{right:20px}.panel{padding:16px}.kicker{text-transform:uppercase;font-size:9px;letter-spacing:.18em;color:#70829b;margin-bottom:13px}.hero{font-size:21px;font-weight:750;line-height:1.08;margin-bottom:7px}.sub{font-size:10px;line-height:1.5;color:#7889a1}.metrics{display:grid;gap:11px}.metric{display:grid;grid-template-columns:1fr auto;gap:6px}.metric label{font-size:10px;color:#a5b2c5}.metric strong{font-size:10px}.track{height:5px;background:#111b2a;border-radius:9px;grid-column:1/-1;overflow:hidden}.track b{display:block;height:100%;border-radius:9px}.foods{display:grid;grid-template-columns:1fr 1fr;gap:7px}.food{padding:10px;border-radius:13px;border:1px solid #22324a;background:#0a1320;color:#eef6ff;text-align:left;cursor:pointer;transition:.2s}.food:hover{transform:translateY(-2px);border-color:#55dcff}.food .emoji{font-size:20px;display:block}.food strong{font-size:10px}.food small{display:block;font-size:8px;color:#718199;margin-top:2px}.modern{box-shadow:inset 2px 0 #ff5d78}.traditional{box-shadow:inset 2px 0 #59e3a0}.buttons{display:flex;gap:6px;flex-wrap:wrap}.btn{border:1px solid #263950;background:#0a1421;color:#dbe8f7;border-radius:9px;padding:8px 10px;font-size:9px;cursor:pointer}.btn:hover,.btn.active{border-color:#5bdfff;color:#9cecff}.feed{height:115px;overflow:hidden}.event{font-size:9px;color:#718198;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}.event b{color:#dce8f6}.focus{position:absolute;top:96px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.14em;color:#8ca0b8}.hint{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.15em;color:#657891}.toast{position:absolute;top:88px;left:50%;transform:translate(-50%,-10px);padding:9px 14px;border-radius:12px;background:#07111ddd;border:1px solid #52dfff66;font-size:10px;opacity:0;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div class="hud">
+<header class="top glass"><div class="brand">DIET<span>//</span>BODY</div><div class="status"><b>● LIVE</b> &nbsp; 3D PHYSIOLOGY LAB &nbsp; / &nbsp; EDUCATIONAL MODEL</div></header>
+<div class="focus" id="focus">FULL BODY · INTERNAL ANATOMY</div>
+<aside class="left">
+<section class="panel glass"><div class="kicker">Interactive model</div><div class="hero">See what food does inside you.</div><div class="sub">Rotate the body, zoom into the anatomy, and introduce foods to see a simplified physiological response.</div></section>
+<section class="panel glass"><div class="kicker">System health</div><div id="metrics" class="metrics"></div></section>
+<section class="panel glass"><div class="kicker">Food laboratory</div><div id="foods" class="foods"></div></section>
+</aside>
+<aside class="right">
+<section class="panel glass"><div class="kicker">Simulation time</div><div class="buttons"><button class="btn active" data-speed="1">1×</button><button class="btn" data-speed="30">30×</button><button class="btn" data-speed="300">5 min/s</button><button class="btn" data-speed="1800">30 min/s</button></div><button id="reset" class="btn" style="width:100%;margin-top:8px">↺ RESET</button></section>
+<section class="panel glass"><div class="kicker">Physiology feed</div><div id="events" class="feed"></div></section>
+<section class="panel glass"><div class="kicker">Explore</div><div class="sub">Drag to rotate · scroll to zoom<br>Click an organ to focus it<br>Click empty space to restore the body</div></section>
+</aside>
+<div class="hint">DRAG TO ROTATE · SCROLL TO ZOOM · CLICK AN ORGAN</div><div id="toast" class="toast"></div>
+</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
-const root=document.querySelector('#scene'),scene=new THREE.Scene();scene.background=new THREE.Color(0x02040a);scene.fog=new THREE.FogExp2(0x02040a,.025);
-const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(0,1.2,9);const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;root.appendChild(renderer.domElement);
-const ctl=new OrbitControls(camera,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.07;ctl.minDistance=4.7;ctl.maxDistance=12;ctl.target.set(0,.9,0);
-scene.add(new THREE.HemisphereLight(0x9fd7ff,0x080b16,1.4));const a=new THREE.PointLight(0x55dcff,55,14);a.position.set(4,5,5);scene.add(a);const b=new THREE.PointLight(0x7d4cff,45,15);b.position.set(-4,2,-4);scene.add(b);const c=new THREE.PointLight(0xff4266,18,8);c.position.set(1,1,4);scene.add(c);
-const state={cardio:88,metabolic:86,gut:82,inflammation:12,glucose:91,speed:1,days:0};
-const organMats={brain:new THREE.MeshPhysicalMaterial({color:0xb66cff,emissive:0x6427b5,emissiveIntensity:.45,roughness:.38,clearcoat:.7}),heart:new THREE.MeshPhysicalMaterial({color:0xff3657,emissive:0xb30e2d,emissiveIntensity:.5,roughness:.32,clearcoat:.65}),liver:new THREE.MeshPhysicalMaterial({color:0xa95738,emissive:0x47150d,emissiveIntensity:.2,roughness:.55}),stomach:new THREE.MeshPhysicalMaterial({color:0xe56f88,emissive:0x741c36,emissiveIntensity:.25,roughness:.45}),gut:new THREE.MeshPhysicalMaterial({color:0x49d69b,emissive:0x0d633f,emissiveIntensity:.3,roughness:.42}),vessel:new THREE.MeshPhysicalMaterial({color:0xe63e59,emissive:0x5b0717,emissiveIntensity:.35,roughness:.28})};
-const shellMat=new THREE.MeshPhysicalMaterial({color:0x8fb4d4,transparent:true,opacity:.075,roughness:.4,metalness:.05,side:THREE.DoubleSide});const muscleMat=new THREE.MeshPhysicalMaterial({color:0x5d718c,transparent:true,opacity:.12,roughness:.65});const boneMat=new THREE.MeshPhysicalMaterial({color:0xd8e5ee,transparent:true,opacity:.18,roughness:.5});
-const body=new THREE.Group();body.position.y=-.65;scene.add(body);const organs=new THREE.Group();body.add(organs);const clickable=[];
-function sphere(name,p,s,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),mat);m.name=name;m.position.set(...p);m.scale.set(...s);organs.add(m);clickable.push(m);return m}
-function capsule(name,p,s,mat){const m=new THREE.Mesh(new THREE.CapsuleGeometry(.25,1,12,24),mat);m.name=name;m.position.set(...p);m.scale.set(...s);organs.add(m);clickable.push(m);return m}
-// Body shell and muscle layers
-sphere('body',[0,1.25,0],[1.22,1.72,.58],shellMat);sphere('thorax',[0,1.7,.05],[1.03,1.15,.53],muscleMat);sphere('head',[0,3.25,0],[.64,.68,.55],shellMat);sphere('neck',[0,2.58,0],[.31,.42,.3],shellMat);capsule('armL',[-1.25,1.35,0],[.65,1.25,.65],shellMat).rotation.z=-.08;capsule('armR',[1.25,1.35,0],[.65,1.25,.65],shellMat).rotation.z=.08;capsule('legL',[-.42,-.35,0],[.78,1.6,.72],shellMat);capsule('legR',[.42,-.35,0],[.78,1.6,.72],shellMat);
-// spine/ribs
-for(let y=1.05;y<2.35;y+=.25){const rib=new THREE.Mesh(new THREE.TorusGeometry(.78,.035,10,50,Math.PI),boneMat);rib.rotation.x=Math.PI/2;rib.position.set(0,y,.03);rib.scale.set(1,.65,1);body.add(rib)}
-const spine=capsule('spine',[0,.8,-.18],[.13,1.55,.13],boneMat);
-const brain=sphere('brain',[0,3.26,.48],[.48,.41,.25],organMats.brain);brain.userData.label='BRAIN';const heart=sphere('heart',[.18,1.9,.53],[.34,.46,.25],organMats.heart);heart.rotation.z=-.2;heart.userData.label='HEART';const liver=sphere('liver',[-.28,1.36,.5],[.7,.36,.24],organMats.liver);liver.userData.label='LIVER';const stomach=sphere('stomach',[.28,.91,.51],[.39,.56,.24],organMats.stomach);stomach.rotation.z=-.25;stomach.userData.label='STOMACH';
-// intestines: nested loops
-for(let y=.18;y<=.62;y+=.18)for(let x=-.48;x<=.48;x+=.32){const t=new THREE.Mesh(new THREE.TorusGeometry(.2,.052,14,36,Math.PI*1.75),organMats.gut);t.position.set(x,y,.52);t.rotation.x=Math.PI/2;t.rotation.z=(x+y)%2?.15:-.15;t.userData.label='INTESTINE';organs.add(t);clickable.push(t)}
-// vascular tree
-function tube(points,r=.035){const curve=new THREE.CatmullRomCurve3(points);const m=new THREE.Mesh(new THREE.TubeGeometry(curve,48,r,10,false),organMats.vessel);m.userData.label='CIRCULATION';organs.add(m);clickable.push(m);return m}
-tube([new THREE.Vector3(0,2.65,.52),new THREE.Vector3(0,2.15,.54),new THREE.Vector3(.18,1.9,.55)],.045);tube([new THREE.Vector3(0,2.15,.54),new THREE.Vector3(0,1.1,.54),new THREE.Vector3(0,.15,.5)],.038);tube([new THREE.Vector3(0,2.25,.54),new THREE.Vector3(-.6,1.85,.52),new THREE.Vector3(-.72,1.35,.5)],.025);tube([new THREE.Vector3(0,2.25,.54),new THREE.Vector3(.6,1.85,.52),new THREE.Vector3(.72,1.35,.5)],.025);
-// artery showcase
-const showcase=new THREE.Group();showcase.position.set(2.0,.35,.4);showcase.rotation.y=-.18;scene.add(showcase);const wall=new THREE.Mesh(new THREE.CylinderGeometry(.46,.46,.22,64),new THREE.MeshPhysicalMaterial({color:0xe66b7d,roughness:.38,emissive:0x42101a,emissiveIntensity:.15}));wall.rotation.z=Math.PI/2;showcase.add(wall);const lumen=new THREE.Mesh(new THREE.CylinderGeometry(.31,.31,.25,64),new THREE.MeshPhysicalMaterial({color:0x300914,roughness:.25,emissive:0x210006,emissiveIntensity:.15}));lumen.rotation.z=Math.PI/2;showcase.add(lumen);const plaque1=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),new THREE.MeshPhysicalMaterial({color:0xffc34d,emissive:0x7a3900,emissiveIntensity:.45,roughness:.3}));plaque1.scale.set(.18,.42,.42);plaque1.position.set(0,.25,0);showcase.add(plaque1);const plaque2=plaque1.clone();plaque2.position.y=-.25;showcase.add(plaque2);const arText=new THREE.Group();showcase.add(arText);
-// nutrient particles
-const pgeo=new THREE.SphereGeometry(.028,10,8);const particles=[];for(let i=0;i<70;i++){const p=new THREE.Mesh(pgeo,new THREE.MeshBasicMaterial({color:i%2?0x57e8ff:0x7dffb2,transparent:true,opacity:.75}));p.position.set((Math.random()-.5)*1.1,.1+Math.random()*2.2,.35+Math.random()*.5);body.add(p);particles.push(p)}
-const foodData=[['🍔','Burger','modern',-5,0,6],['🥤','Soda','modern',12,0,1],['🥔','Chips','modern',2,1,7],['🐟','Fish','trad',0,8,2],['🥬','Vegetables','trad',2,1,1],['🫘','Beans','trad',1,7,1]];const foodEl=document.querySelector('#foods');foodData.forEach(f=>{const d=document.createElement('button');d.className='food '+f[2];d.innerHTML=`<span class="e">${f[0]}</span><b>${f[1]}</b><small>${f[2]==='modern'?'MODERN':'TRADITIONAL'}</small>`;d.onclick=()=>consume(f);foodEl.appendChild(d)});
-const metrics=[['cardio','Cardiovascular'],['metabolic','Metabolic'],['gut','Gut environment'],['inflammation','Inflammation']];const metricEl=document.querySelector('#metrics');function drawMetrics(){metricEl.innerHTML='';metrics.forEach(([k,n])=>{const v=Math.round(state[k]);const d=document.createElement('div');d.className='m';d.innerHTML=`<span>${n}</span><strong>${v}%</strong><div class="bar"><i style="width:${Math.max(3,v)}%;background:${k==='inflammation'?'#ff607b':'#5ce0ff'}"></i></div>`;metricEl.appendChild(d)})}drawMetrics();
-const feed=document.querySelector('#feed');function log(title,msg){const d=document.createElement('div');d.className='event';d.innerHTML=`<b>${title}</b> · ${msg}`;feed.prepend(d);while(feed.children.length>6)feed.lastChild.remove()}log('LAB ONLINE','3D physiological model initialized');log('ANATOMY','Internal systems rendered');
-function toast(t){const x=document.querySelector('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1500)}
-function consume(f){const modern=f[2]==='modern';state.cardio=Math.max(35,Math.min(99,state.cardio+(modern?-f[3]:f[4]*.45)));state.metabolic=Math.max(35,Math.min(99,state.metabolic+(modern?-Math.max(1,f[3]*.3):f[4]*.2)));state.gut=Math.max(35,Math.min(99,state.gut+(modern?-1:f[4]*.35)));state.inflammation=Math.max(3,Math.min(90,state.inflammation+(modern?f[3]*.65:-f[4]*.22)));state.glucose=Math.max(55,Math.min(150,state.glucose+(modern?f[3]*2:-f[4])));drawMetrics();log(f[1],modern?'acute dietary load detected':'fiber / omega-3 input detected');toast(`${f[1]} entered the model`);pulse=1}
-let pulse=0;document.querySelectorAll('[data-speed]').forEach(x=>x.onclick=()=>{document.querySelectorAll('[data-speed]').forEach(b=>b.classList.remove('on'));x.classList.add('on');state.speed=+x.dataset.speed;toast(`Simulation speed ${x.textContent}`)});document.querySelector('#reset').onclick=()=>{Object.assign(state,{cardio:88,metabolic:86,gut:82,inflammation:12,glucose:91,days:0});drawMetrics();log('LAB RESET','Baseline physiology restored');toast('Laboratory reset')};
-const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();renderer.domElement.addEventListener('pointerdown',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,camera);const hit=ray.intersectObjects(clickable,false)[0];if(hit){const o=hit.object;const label=o.userData.label||o.name.toUpperCase();document.querySelector('#focus').textContent=label+' · FOCUSED VIEW';toast(label+' selected');organs.children.forEach(q=>{q.material&&(q.material.opacity=q===o?1:.16);if(q.material)q.material.transparent=true});}else{organs.children.forEach(q=>{if(q.material)q.material.opacity=1})}});
-let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min(.05,(now-last)/1000);last=now;ctl.update();const beat=1+Math.sin(now*.009)*.035;heart.scale.y=beat;heart.scale.x=1/beat+.02;heart.material.emissiveIntensity=.35+Math.sin(now*.009)*.2+pulse*.35;pulse*=.94;brain.material.emissiveIntensity=.35+Math.sin(now*.0015)*.12;plaque1.scale.y=.22+state.inflammation/170;plaque2.scale.y=plaque1.scale.y;const flow=now*.00035*state.speed;particles.forEach((p,i)=>{const q=(flow+i/70)%1;p.position.y=.05+q*2.5;p.position.x=Math.sin(q*9+i)*.38;p.position.z=.35+Math.cos(q*7+i)*.18;p.material.opacity=.25+.65*Math.sin(q*Math.PI)});state.days+=dt*state.speed/86400;if(state.days>365){state.days=0;state.inflammation=Math.min(90,state.inflammation+.015);state.cardio=Math.max(35,state.cardio-.006);state.gut=Math.max(35,state.gut-.004);drawMetrics()}showcase.rotation.y=-.18+Math.sin(now*.0005)*.04;renderer.render(scene,camera)}animate(performance.now());addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-</script></body></html>
+
+const root=document.getElementById('scene');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x02040a);
+scene.fog=new THREE.FogExp2(0x02040a,0.018);
+const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);
+camera.position.set(0,1.2,9);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.2;
+root.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=.07;controls.enablePan=false;controls.minDistance=4.8;controls.maxDistance=12;controls.target.set(0,1,0);
+scene.add(new THREE.HemisphereLight(0x9fd7ff,0x080b16,1.35));
+const cyan=new THREE.PointLight(0x55dcff,50,15);cyan.position.set(4,5,5);scene.add(cyan);
+const violet=new THREE.PointLight(0x7d4cff,35,14);violet.position.set(-4,2,-4);scene.add(violet);
+const red=new THREE.PointLight(0xff4266,16,9);red.position.set(1,1,4);scene.add(red);
+
+const state={cardio:88,metabolic:86,gut:80,inflammation:12,glucose:91,speed:1};
+const body=new THREE.Group();body.position.y=-.55;scene.add(body);
+const clickable=[];
+function material(color,rough=.5,emit=0,opacity=1){return new THREE.MeshPhysicalMaterial({color,roughness:rough,metalness:.05,clearcoat:.35,emissive:color,emissiveIntensity:emit,transparent:opacity<1,opacity,side:THREE.DoubleSide});}
+const shell=material(0x7d9bb7,.7,.02,.13);
+const muscle=material(0x49617a,.65,.02,.16);
+const brainMat=material(0xb66cff,.38,.22,1);
+const heartMat=material(0xff3e5d,.32,.28,1);
+const liverMat=material(0xb55c40,.5,.07,1);
+const stomachMat=material(0xe5748d,.48,.1,1);
+const gutMat=material(0x51dda0,.45,.13,1);
+const vesselMat=material(0xff3d5b,.3,.25,1);
+function mesh(geometry,pos,scale,mat,name,parent=body){const m=new THREE.Mesh(geometry,mat);m.position.set(...pos);m.scale.set(...scale);m.name=name;parent.add(m);clickable.push(m);return m;}
+function sphere(name,pos,scale,mat){return mesh(new THREE.SphereGeometry(1,48,32),pos,scale,mat,name);}
+function tube(name,points,radius,mat,parent=body){const curve=new THREE.CatmullRomCurve3(points);return mesh(new THREE.TubeGeometry(curve,48,radius,10,false),[0,0,0],[1,1,1],mat,name,parent);}
+// body shell and depth
+sphere('BODY',[0,1.25,0],[1.2,1.72,.58],shell);
+sphere('THORAX',[0,1.7,.08],[1.03,1.18,.55],muscle);
+sphere('HEAD',[0,3.25,0],[.65,.7,.56],shell);
+sphere('NECK',[0,2.58,0],[.3,.43,.3],shell);
+// limbs
+sphere('ARM LEFT',[-1.25,1.35,0],[.25,1.2,.28],shell);sphere('ARM RIGHT',[1.25,1.35,0],[.25,1.2,.28],shell);
+sphere('LEG LEFT',[-.44,-.35,0],[.34,1.55,.35],shell);sphere('LEG RIGHT',[.44,-.35,0],[.34,1.55,.35],shell);
+// ribs
+const bone=material(0xd7e3ea,.65,.02,.22);
+for(let y=1.3;y<2.3;y+=.25){const rib=new THREE.Mesh(new THREE.TorusGeometry(.8,.025,8,48,Math.PI),bone);rib.rotation.x=Math.PI/2;rib.scale.set(1,.72,1);rib.position.set(0,y,.1);body.add(rib);}
+// organs
+const brain=sphere('BRAIN',[0,3.25,.52],[.48,.41,.24],brainMat);
+const heart=sphere('HEART',[.18,1.98,.58],[.34,.44,.24],heartMat);heart.rotation.z=-.22;
+sphere('LIVER',[-.28,1.38,.55],[.68,.35,.22],liverMat);
+const stomach=sphere('STOMACH',[.3,.95,.56],[.4,.55,.22],stomachMat);stomach.rotation.z=-.25;
+const gut=new THREE.Group();body.add(gut);
+for(let row=0;row<4;row++){for(let col=0;col<3;col++){const t=new THREE.Mesh(new THREE.TorusGeometry(.22,.052,12,36,Math.PI*1.7),gutMat);t.position.set(-.44+col*.44,.25+row*.17,.54);t.rotation.x=Math.PI/2;t.rotation.z=(col-1)*.15;t.name='INTESTINE';gut.add(t);clickable.push(t);}}
+// major blood vessels
+tube('AORTA',[new THREE.Vector3(0,2.7,.55),new THREE.Vector3(0,2.25,.58),new THREE.Vector3(.18,1.98,.6)],.045,vesselMat);
+tube('DESCENDING AORTA',[new THREE.Vector3(0,2.35,.58),new THREE.Vector3(0,1.2,.55),new THREE.Vector3(0,.1,.48)],.04,vesselMat);
+tube('VESSEL LEFT',[new THREE.Vector3(0,2.4,.58),new THREE.Vector3(-.48,2.08,.57),new THREE.Vector3(-.45,1.45,.54)],.018,vesselMat);
+tube('VESSEL RIGHT',[new THREE.Vector3(0,2.4,.58),new THREE.Vector3(.48,2.08,.57),new THREE.Vector3(.45,1.45,.54)],.018,vesselMat);
+// artery cutaway
+const artery=new THREE.Group();artery.position.set(2.05,-.1,.4);artery.rotation.y=-.18;scene.add(artery);
+const wall=new THREE.Mesh(new THREE.CylinderGeometry(.46,.46,.24,64),material(0xd87384,.38,.02,.22));wall.rotation.z=Math.PI/2;artery.add(wall);
+const lumen=new THREE.Mesh(new THREE.CylinderGeometry(.31,.31,.27,64),material(0x220812,.22,.04,.9));lumen.rotation.z=Math.PI/2;artery.add(lumen);
+const plaqueMat=material(0xffc34d,.28,.3,1);
+const plaqueA=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),plaqueMat);plaqueA.scale.set(.23,.25,.34);plaqueA.position.set(-.08,.2,0);artery.add(plaqueA);
+const plaqueB=plaqueA.clone();plaqueB.position.set(.08,-.2,0);artery.add(plaqueB);
+// particles
+const particles=[];for(let i=0;i<55;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.025,8,8),new THREE.MeshBasicMaterial({color:i%2?0x58e9ff:0x6dffb1,transparent:true,opacity:.7}));p.position.set((Math.random()-.5)*.9,.1+Math.random()*2.5,.45);body.add(p);particles.push(p);}
+// UI
+const foods=[['🍔','Burger','modern',7,8,1,0],['🥤','Soda','modern',1,0,0,0],['🥔','Chips','modern',8,5,1,0],['🐟','Fish','traditional',2,1,0,9],['🥬','Vegetables','traditional',1,0,8,1],['🫘','Beans','traditional',1,0,7,1]];
+const foodsEl=document.getElementById('foods');
+foods.forEach((f,i)=>{const b=document.createElement('button');b.className='food '+f[2];b.innerHTML=`<span class="emoji">${f[0]}</span><strong>${f[1]}</strong><small>${f[2]}</small>`;b.onclick=()=>consume(f);b.draggable=true;b.ondragstart=e=>e.dataTransfer.setData('food',String(i));foodsEl.appendChild(b);});
+renderer.domElement.ondragover=e=>e.preventDefault();renderer.domElement.ondrop=e=>{const i=Number(e.dataTransfer.getData('food'));if(foods[i])consume(foods[i]);};
+const metricsEl=document.getElementById('metrics');
+function renderMetrics(){const vals=[['Cardiovascular',state.cardio],['Metabolic stability',state.metabolic],['Gut ecosystem',state.gut],['Inflammation',100-state.inflammation],['Glucose stability',Math.max(0,100-Math.abs(state.glucose-90)*.75)]];metricsEl.innerHTML=vals.map(v=>`<div class="metric"><label>${v[0]}</label><strong>${Math.round(v[1])}%</strong><div class="track"><b style="width:${Math.max(0,Math.min(100,v[1]))}%;background:${v[1]>70?'#59e3a0':v[1]>45?'#ffc85b':'#ff5d78'}"></b></div></div>`).join('');}
+const events=document.getElementById('events');
+function log(text){const d=document.createElement('div');d.className='event';d.innerHTML=`${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · ${text}`;events.prepend(d);while(events.children.length>7)events.lastChild.remove();}
+function toast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200);}
+function consume(f){if(f[2]==='modern'){state.glucose+=f[3]*1.5;state.inflammation+=f[3]*.35+f[4]*.25;state.cardio-=f[3]*.25+f[4]*.18;state.metabolic-=f[3]*.18;state.gut-=Math.max(0,2-f[5])*.5;}else{state.glucose+=f[3]*.5;state.inflammation-=f[6]*.2;state.cardio+=f[6]*.25+f[5]*.08;state.gut+=f[5]*.35;state.metabolic+=f[5]*.12;}state.glucose=Math.max(55,Math.min(180,state.glucose));state.inflammation=Math.max(0,Math.min(100,state.inflammation));state.cardio=Math.max(0,Math.min(100,state.cardio));state.metabolic=Math.max(0,Math.min(100,state.metabolic));state.gut=Math.max(0,Math.min(100,state.gut));log(`${f[0]} <b>${f[1]}</b> entered the model`);toast(`${f[1]} entered the body`);renderMetrics();}
+renderMetrics();log('<b>System online</b> · 3D anatomy initialized');log('Choose a food or drag it into the body');
+let selected=null;const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();renderer.domElement.addEventListener('pointerdown',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);const hit=raycaster.intersectObjects(clickable,false)[0];if(hit){selected=hit.object;document.getElementById('focus').textContent=selected.name+' · FOCUSED';toast(selected.name+' selected');clickable.forEach(o=>{if(o.material&&o!==selected){o.material.opacity=.16;o.material.transparent=true;}});}else{selected=null;document.getElementById('focus').textContent='FULL BODY · INTERNAL ANATOMY';clickable.forEach(o=>{if(o.material){o.material.opacity=1;o.material.transparent=false;}});}});
+document.querySelectorAll('[data-speed]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-speed]').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.speed=Number(b.dataset.speed);toast('Speed '+b.textContent);});
+document.getElementById('reset').onclick=()=>{Object.assign(state,{cardio:88,metabolic:86,gut:80,inflammation:12,glucose:91,speed:state.speed});renderMetrics();log('<b>Simulation reset</b> · baseline restored');toast('Baseline restored');};
+let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min(.05,(now-last)/1000);last=now;controls.update();const beat=1+Math.sin(now*.006)*.035;heart.scale.set(beat,beat,beat);heart.material.emissiveIntensity=.2+Math.max(0,Math.sin(now*.006))*.18;brain.material.emissiveIntensity=.18+Math.sin(now*.0015)*.06;gut.children.forEach((o,i)=>o.rotation.z+=dt*(.04+i*.002));plaqueA.scale.y=plaqueB.scale.y=1+state.inflammation/100*.5;plaqueA.scale.z=plaqueB.scale.z=1+state.inflammation/100*.25;particles.forEach((p,i)=>{p.position.y+=dt*(.12+state.speed*.0005);if(p.position.y>2.7)p.position.y=.1;});state.inflammation=Math.min(100,state.inflammation+dt*state.speed*.0005);state.cardio=Math.max(0,state.cardio-dt*state.speed*.0002);state.metabolic=Math.max(0,state.metabolic-dt*state.speed*.00012);state.glucose+=(91-state.glucose)*dt*.015;renderMetrics();renderer.render(scene,camera);}animate(performance.now());
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>
