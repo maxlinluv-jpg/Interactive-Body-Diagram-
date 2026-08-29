@@ -1,1 +1,238 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diet//Body — Anatomy Visualization</title><style>html,body{margin:0;height:100%;overflow:hidden;background:#02050a;color:#edf7ff;font-family:Inter,system-ui,sans-serif}#app{position:fixed;inset:0}.ui{position:fixed;inset:0;pointer-events:none}.panel{pointer-events:auto;position:absolute;background:#050c16c9;border:1px solid #8bdcff22;backdrop-filter:blur(18px);border-radius:18px;padding:15px;box-shadow:0 20px 70px #0008}.left{left:18px;top:18px;width:265px}.right{right:18px;top:18px;width:245px}.title{font-weight:900;letter-spacing:.2em}.title i{color:#67e8ff;font-style:normal}.eyebrow{font-size:8px;letter-spacing:.18em;color:#7188a3;text-transform:uppercase;margin:14px 0 7px}.desc{font-size:9px;line-height:1.5;color:#91a4ba}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{background:#091523;border:1px solid #20334a;color:#dceafa;border-radius:9px;padding:8px;font-size:8px;cursor:pointer}button:hover,button.active{border-color:#60ddff;color:#9eeeff}.food{width:100%;text-align:left;margin-top:5px}.food b{font-size:15px;margin-right:5px}.meter{margin:8px 0}.meter span{display:flex;justify-content:space-between;font-size:8px}.bar{height:4px;background:#122033;border-radius:9px;margin-top:4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#5edcff,#65e5ad)}#focus{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.18em;color:#91a6bf;white-space:nowrap}.hint{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.15em;color:#6c829d}</style></head><body><div id="app"></div><div class="ui"><div class="panel left"><div class="title">DIET<i>//</i>BODY</div><div class="eyebrow">Anatomy engine</div><div class="desc">Explore the body from multiple anatomical angles. Click systems to isolate them and use the camera presets for different views.</div><div class="eyebrow">Systems</div><div id="systems" class="grid"></div><div class="eyebrow">Camera views</div><div id="views" class="grid"></div><div class="eyebrow">Food simulation</div><div id="foods"></div></div><div class="panel right"><div class="eyebrow">Selected structure</div><b id="selected">FULL BODY</b><div id="info" class="desc">Click an organ to inspect it.</div><div class="eyebrow">Modeled state</div><div id="meters"></div><div class="eyebrow">Display</div><div class="grid"><button id="xray">X-RAY</button><button id="digest">DIGESTION</button></div></div><div id="focus">FULL BODY · ANTERIOR VIEW</div><div class="hint">DRAG TO ORBIT · SCROLL TO ZOOM · CAMERA PRESETS</div></div><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script><script type="module">import*as THREE from'three';import{OrbitControls}from'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';const A=document.querySelector('#app'),S=new THREE.Scene();S.background=new THREE.Color(0x02050a);const C=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);C.position.set(0,1.2,8.5);const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(innerWidth,innerHeight);R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.2;A.appendChild(R.domElement);const O=new OrbitControls(C,R.domElement);O.enableDamping=true;O.dampingFactor=.06;O.enablePan=false;O.minDistance=3;O.maxDistance=12;O.target.set(0,1.2,0);S.add(new THREE.HemisphereLight(0xbde7ff,0x080b14,1.3));let L=new THREE.PointLight(0x58ddff,60,17);L.position.set(4,5,5);S.add(L);L=new THREE.PointLight(0x9b63ff,32,14);L.position.set(-4,2,-3);S.add(L);const M=new THREE.Group();M.position.y=-.55;S.add(M),G={},Q=[];const mat=(c,o=1,e=.03,r=.5)=>new THREE.MeshPhysicalMaterial({color:c,roughness:r,clearcoat:.35,emissive:c,emissiveIntensity:e,transparent:o<1,opacity:o,side:THREE.DoubleSide}),skin=mat(0x7895aa,.07,.01,.7),bone=mat(0xe0e8ee,.3,.02,.5),heartM=mat(0xff405f,1,.3,.3),lung=mat(0x956579,.8,.07),liver=mat(0xa95540),stomach=mat(0xe5748b),gut=mat(0x55dfa2,1,.12),kidney=mat(0x873448),brain=mat(0xb174ff,1,.17),blood=mat(0xff4562,1,.2),pan=mat(0xe1a05f);function add(n,s,o,i){o.userData.n=n;G[n]={s,o,i};Q.push(o);return o}function sph(n,s,p,z,m,i){let o=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),m);o.position.set(...p);o.scale.set(...z);M.add(o);return add(n,s,o,i)}function tube(n,s,p,r,m,i){let o=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(p),48,r,10,false),m);M.add(o);return add(n,s,o,i)}sph('Body surface','Body',[0,1.45,0],[1.03,1.82,.52],skin,'Transparent body envelope');sph('Head','Body',[0,3.42,0],[.61,.69,.52],skin,'Head');sph('Left arm','Body',[-1.03,1.42,0],[.22,.95,.24],skin,'Left arm');sph('Right arm','Body',[1.03,1.42,0],[.22,.95,.24],skin,'Right arm');sph('Left leg','Body',[-.37,-.55,0],[.31,1.27,.32],skin,'Left leg');sph('Right leg','Body',[.37,-.55,0],[.31,1.27,.32],skin,'Right leg');let rg=new THREE.Group();M.add(rg);add('Rib cage','Skeletal',rg,'Rib cage');for(let y=1.25;y<2.4;y+=.22){let q=new THREE.Mesh(new THREE.TorusGeometry(.76,.023,8,64,Math.PI),bone);q.rotation.x=Math.PI/2;q.scale.set(1,.72,1);q.position.set(0,y,.03);rg.add(q)}tube('Spine','Skeletal',[new THREE.Vector3(0,2.55,-.1),new THREE.Vector3(0,1.35,-.1),new THREE.Vector3(0,.12,-.08)],.038,bone,'Spine');sph('Brain','Nervous',[0,3.42,.48],[.47,.4,.25],brain,'Brain');let lungs=new THREE.Group();M.add(lungs);add('Lungs','Respiratory',lungs,'Paired lungs');[-.38,.38].forEach(x=>{let q=new THREE.Mesh(new THREE.SphereGeometry(1,40,28),lung);q.position.set(x,1.98,.46);q.scale.set(.32,.7,.23);lungs.add(q)});tube('Trachea','Respiratory',[new THREE.Vector3(0,2.67,.5),new THREE.Vector3(0,2.35,.5)],.045,lung,'Trachea');tube('Esophagus','Digestive',[new THREE.Vector3(0,2.6,.52),new THREE.Vector3(.04,1.5,.54),new THREE.Vector3(.28,1.12,.55)],.05,stomach,'Esophagus');sph('Liver','Digestive',[-.28,1.3,.5],[.7,.34,.23],liver,'Liver');sph('Stomach','Digestive',[.3,.92,.55],[.39,.52,.23],stomach,'Stomach');sph('Pancreas','Digestive',[.04,.82,.57],[.5,.11,.1],pan,'Pancreas');let ig=new THREE.Group();M.add(ig);add('Intestines','Digestive',ig,'Small and large intestines');for(let r=0;r<6;r++)for(let c=0;c<5;c++){let q=new THREE.Mesh(new THREE.TorusGeometry(.15,.038,10,42,Math.PI*1.82),gut);q.position.set(-.6+c*.3,.03+r*.13,.52);q.rotation.x=Math.PI/2;ig.add(q)}tube('Colon','Digestive',[new THREE.Vector3(-.62,.02,.55),new THREE.Vector3(-.62,.75,.55),new THREE.Vector3(.62,.75,.55),new THREE.Vector3(.62,.02,.55)],.055,gut,'Colon');sph('Heart','Cardiovascular',[.16,1.94,.57],[.24,.31,.18],heartM,'Heart — reduced chest proportion');tube('Aorta','Cardiovascular',[new THREE.Vector3(.02,2.55,.56),new THREE.Vector3(.02,2.25,.57),new THREE.Vector3(.16,1.94,.58),new THREE.Vector3(.04,.15,.47)],.042,blood,'Aorta');sph('Left kidney','Urinary',[-.47,.78,.43],[.19,.32,.14],kidney,'Left kidney');sph('Right kidney','Urinary',[.47,.78,.43],[.19,.32,.14],kidney,'Right kidney');const systems=['Body','Skeletal','Digestive','Cardiovascular','Respiratory','Nervous','Urinary'];function system(s){Object.values(G).forEach(v=>v.o.visible=s==='Body'||v.s===s||v.s==='Body');document.querySelector('#selected').textContent=s==='Body'?'FULL BODY':s.toUpperCase();document.querySelector('#info').textContent=s==='Body'?'Full layered anatomy':'Isolated '+s.toLowerCase()+' system'}systems.forEach(s=>{let b=document.createElement('button');b.textContent=s;b.onclick=()=>system(s);document.querySelector('#systems').appendChild(b)});const views={Anterior:[0,1.2,8.5],Posterior:[0,1.2,-8.5],Left:[-8.5,1.2,0],Right:[8.5,1.2,0],Superior:[0,8,.1],Inferior:[0,-6,.1],Oblique:[5,3.2,6]};let vn='ANTERIOR VIEW';Object.entries(views).forEach(([n,p])=>{let b=document.createElement('button');b.textContent=n;b.onclick=()=>{C.position.set(...p);O.target.set(0,1.2,0);O.update();vn=n.toUpperCase()+' VIEW';document.querySelector('#focus').textContent='FULL BODY · '+vn};document.querySelector('#views').appendChild(b)});const state={cardio:88,gut:80,metabolic:86,inflammation:12};function meters(){document.querySelector('#meters').innerHTML=[['Cardiovascular',state.cardio],['Gut ecosystem',state.gut],['Metabolic stability',state.metabolic],['Inflammation',100-state.inflammation]].map(x=>`<div class="meter"><span><b>${x[0]}</b><b>${Math.round(x[1])}%</b></span><div class="bar"><i style="width:${x[1]}%"></i></div></div>`).join('')}meters();[['🥤','Soda',-4,-2,0],['🍔','Burger',-2,-1,1],['🥬','Vegetables',1,1,7],['🐟','Fish',1,1,5],['🫘','Beans',0,0,7]].forEach(f=>{let b=document.createElement('button');b.className='food';b.innerHTML=`<b>${f[0]}</b>${f[1]}`;b.onclick=()=>{state.inflammation=Math.max(0,state.inflammation+f[2]);state.metabolic=Math.max(0,Math.min(100,state.metabolic+f[3]));state.gut=Math.max(0,Math.min(100,state.gut+f[4]));meters()};document.querySelector('#foods').appendChild(b)});document.querySelector('#xray').onclick=()=>{Object.values(G).forEach(v=>{v.o.visible=true;v.o.traverse(x=>{if(x.material){x.material.opacity=v.s==='Body'?.035:.85;x.material.transparent=true}})})};document.querySelector('#digest').onclick=()=>system('Digestive');const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();R.domElement.addEventListener('pointerdown',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(mouse,C);let h=ray.intersectObjects(Q,true)[0];if(h){let n=h.object.userData.n||'Structure';document.querySelector('#selected').textContent=n;document.querySelector('#info').textContent=G[n]?.i||'';document.querySelector('#focus').textContent=n.toUpperCase()+' · '+vn}});let last=performance.now();function loop(t){requestAnimationFrame(loop);let d=Math.min(.05,(t-last)/1000);last=t;O.update();let h=G.Heart?.o;if(h){let k=1+Math.sin(t*.006)*.025;h.scale.set(k,k,k)}R.render(S,C)}loop(performance.now());addEventListener('resize',()=>{C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diet//Body — Anatomy Visualization</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#02050a;color:#edf7ff;font-family:Inter,system-ui,sans-serif}
+#app{position:fixed;inset:0}
+.ui{position:fixed;inset:0;pointer-events:none}
+.panel{pointer-events:auto;position:absolute;background:#050c16d9;border:1px solid #8bdcff25;backdrop-filter:blur(18px);border-radius:18px;padding:15px;box-shadow:0 20px 70px #0008}
+.left{left:18px;top:18px;width:265px}.right{right:18px;top:18px;width:245px}
+.title{font-weight:900;letter-spacing:.2em}.title i{color:#67e8ff;font-style:normal}
+.eyebrow{font-size:8px;letter-spacing:.18em;color:#7188a3;text-transform:uppercase;margin:14px 0 7px}
+.desc{font-size:9px;line-height:1.5;color:#91a4ba}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+button{background:#091523;border:1px solid #20334a;color:#dceafa;border-radius:9px;padding:8px;font-size:8px;cursor:pointer}
+button:hover,button.active{border-color:#60ddff;color:#9eeeff}
+.food{width:100%;text-align:left;margin-top:5px}.food b{font-size:15px;margin-right:5px}
+.meter{margin:8px 0}.meter span{display:flex;justify-content:space-between;font-size:8px}
+.bar{height:4px;background:#122033;border-radius:9px;margin-top:4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#5edcff,#65e5ad)}
+#focus{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.18em;color:#91a6bf;white-space:nowrap}
+.hint{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.15em;color:#6c829d;white-space:nowrap}
+#toast{position:absolute;left:50%;bottom:42px;transform:translateX(-50%);padding:8px 12px;border:1px solid #67e8ff33;border-radius:10px;background:#06111ddd;color:#aeefff;font-size:9px;opacity:0;transition:.25s}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="ui">
+  <div class="panel left">
+    <div class="title">DIET<i>//</i>BODY</div>
+    <div class="eyebrow">Anatomy engine</div>
+    <div class="desc">Explore layered anatomy from multiple angles, then switch to a digestive cutaway to watch food move through the tract.</div>
+    <div class="eyebrow">Systems</div><div id="systems" class="grid"></div>
+    <div class="eyebrow">Camera views</div><div id="views" class="grid"></div>
+    <div class="eyebrow">Food simulation</div><div id="foods"></div>
+  </div>
+  <div class="panel right">
+    <div class="eyebrow">Selected structure</div><b id="selected">FULL BODY</b>
+    <div id="info" class="desc">Click an organ to inspect it.</div>
+    <div class="eyebrow">Modeled state</div><div id="meters"></div>
+    <div class="eyebrow">Visualization</div>
+    <div class="grid">
+      <button id="xray">X-RAY</button><button id="digest">DIGESTION</button>
+      <button id="cutaway">CUTAWAY</button><button id="reset">RESET</button>
+    </div>
+  </div>
+  <div id="focus">FULL BODY · ANTERIOR VIEW</div>
+  <div class="hint">DRAG TO ORBIT · SCROLL TO ZOOM · TRY CUTAWAY</div>
+  <div id="toast"></div>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+
+const app=document.getElementById('app');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x02050a);
+scene.fog=new THREE.Fog(0x02050a,9,18);
+
+const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);
+camera.position.set(0,1.2,8.5);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+app.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.dampingFactor=.07; controls.enablePan=false;
+controls.minDistance=3.2; controls.maxDistance=13; controls.target.set(0,1.25,0);
+
+scene.add(new THREE.HemisphereLight(0xbde7ff,0x080b14,1.35));
+const key=new THREE.PointLight(0x58ddff,65,18); key.position.set(4,5,5); scene.add(key);
+const fill=new THREE.PointLight(0x9b63ff,28,14); fill.position.set(-4,2,-3); scene.add(fill);
+
+const body=new THREE.Group(); body.position.y=-.55; scene.add(body);
+const groups={}; const structures=[]; const digestiveParts=[]; const foodParticles=[];
+const materials={
+ skin:new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.10,roughness:.72,clearcoat:.25,side:THREE.DoubleSide}),
+ bone:new THREE.MeshPhysicalMaterial({color:0xe0e8ee,transparent:true,opacity:.38,roughness:.5,side:THREE.DoubleSide}),
+ heart:new THREE.MeshPhysicalMaterial({color:0xe83d5a,roughness:.32,clearcoat:.45,emissive:0x3b0710,emissiveIntensity:.3}),
+ lung:new THREE.MeshPhysicalMaterial({color:0x9b6678,transparent:true,opacity:.82,roughness:.48,side:THREE.DoubleSide}),
+ liver:new THREE.MeshPhysicalMaterial({color:0xa95540,roughness:.42,clearcoat:.25}),
+ stomach:new THREE.MeshPhysicalMaterial({color:0xe5748b,roughness:.4,clearcoat:.3}),
+ gut:new THREE.MeshPhysicalMaterial({color:0x55dfa2,roughness:.38,clearcoat:.35,emissive:0x0a2d1f,emissiveIntensity:.2}),
+ kidney:new THREE.MeshPhysicalMaterial({color:0x873448,roughness:.4}),
+ brain:new THREE.MeshPhysicalMaterial({color:0xb174ff,roughness:.42,clearcoat:.3,emissive:0x170b2d,emissiveIntensity:.25}),
+ blood:new THREE.MeshBasicMaterial({color:0xff4562}),
+ food:new THREE.MeshStandardMaterial({color:0xffc857,emissive:0x8a4c00,emissiveIntensity:1.4})
+};
+
+function group(name){if(!groups[name]){groups[name]=new THREE.Group();body.add(groups[name]);}return groups[name];}
+function register(name,system,obj,description,container){obj.userData.name=name;obj.userData.system=system;obj.userData.description=description;structures.push(obj);group(system).add(obj);if(container)container.push(obj);return obj;}
+function sphere(name,system,pos,scale,material,description,container){const o=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),material);o.position.set(...pos);o.scale.set(...scale);return register(name,system,o,description,container);}
+function tube(name,system,points,radius,material,description,container){const curve=new THREE.CatmullRomCurve3(points);const o=new THREE.Mesh(new THREE.TubeGeometry(curve,64,radius,14,false),material);return register(name,system,o,description,container);}
+
+// Body envelope and limbs
+sphere('Body surface','Body',[0,1.45,0],[1.03,1.82,.52],materials.skin,'Transparent body envelope');
+sphere('Head','Body',[0,3.42,0],[.61,.69,.52],materials.skin,'Head and neck region');
+sphere('Left arm','Body',[-1.03,1.42,0],[.22,.95,.24],materials.skin,'Left arm');
+sphere('Right arm','Body',[1.03,1.42,0],[.22,.95,.24],materials.skin,'Right arm');
+sphere('Left leg','Body',[-.37,-.55,0],[.31,1.27,.32],materials.skin,'Left leg');
+sphere('Right leg','Body',[.37,-.55,0],[.31,1.27,.32],materials.skin,'Right leg');
+
+// Skeleton
+const ribs=group('Skeletal');
+ribs.userData={name:'Rib cage',system:'Skeletal',description:'Protective thoracic cage'}; structures.push(ribs);
+for(let y=1.22;y<2.42;y+=.22){const r=new THREE.Mesh(new THREE.TorusGeometry(.76,.023,8,64,Math.PI),materials.bone);r.rotation.x=Math.PI/2;r.scale.set(1,.72,1);r.position.set(0,y,.03);ribs.add(r);}
+tube('Spine','Skeletal',[new THREE.Vector3(0,2.55,-.1),new THREE.Vector3(0,1.35,-.1),new THREE.Vector3(0,.12,-.08)],.038,materials.bone,'Spinal column');
+
+// Nervous
+sphere('Brain','Nervous',[0,3.42,.48],[.47,.4,.25],materials.brain,'Brain');
+for(let i=0;i<7;i++){
+ const line=[]; const y=3.25+i*.055;
+ line.push(new THREE.Vector3(-.34,y,.67),new THREE.Vector3(0,y+.03,.70),new THREE.Vector3(.34,y,.67));
+ tube('Brain fold '+(i+1),'Nervous',line,.009,materials.brain,'Brain surface fold');
+}
+
+// Respiratory
+const lungL=sphere('Left lung','Respiratory',[-.38,1.98,.46],[.32,.70,.23],materials.lung,'Left lung');
+const lungR=sphere('Right lung','Respiratory',[.38,1.98,.46],[.32,.70,.23],materials.lung,'Right lung');
+tube('Trachea','Respiratory',[new THREE.Vector3(0,2.68,.5),new THREE.Vector3(0,2.35,.5)],.045,materials.lung,'Trachea');
+
+// Digestive tract: a deliberately clear, vertically oriented path
+const esophagus=tube('Esophagus','Digestive',[new THREE.Vector3(0,2.62,.57),new THREE.Vector3(.02,2.15,.58),new THREE.Vector3(.08,1.55,.59),new THREE.Vector3(.25,1.22,.60)],.055,materials.stomach,'Food passage from throat to stomach',digestiveParts);
+const liver=sphere('Liver','Digestive',[-.28,1.30,.50],[.70,.34,.23],materials.liver,'Liver');
+const stomach=sphere('Stomach','Digestive',[.30,.92,.57],[.39,.52,.23],materials.stomach,'Stomach — food storage and digestion',digestiveParts);
+sphere('Pancreas','Digestive',[.04,.82,.59],[.50,.11,.10],materials.pan,'Pancreas');
+const intestines=group('Digestive');
+intestines.userData={name:'Intestines',system:'Digestive',description:'Small and large intestine'};structures.push(intestines);digestiveParts.push(intestines);
+for(let r=0;r<6;r++)for(let c=0;c<5;c++){
+ const q=new THREE.Mesh(new THREE.TorusGeometry(.15,.038,10,42,Math.PI*1.82),materials.gut);
+ q.position.set(-.60+c*.30,.03+r*.13,.55);q.rotation.x=Math.PI/2;intestines.add(q);
+}
+tube('Colon','Digestive',[new THREE.Vector3(-.62,.02,.58),new THREE.Vector3(-.62,.75,.58),new THREE.Vector3(.62,.75,.58),new THREE.Vector3(.62,.02,.58)],.055,materials.gut,'Large intestine',digestiveParts);
+
+// Cardiovascular
+const heart=sphere('Heart','Cardiovascular',[.16,1.94,.60],[.24,.31,.18],materials.heart,'Heart — reduced chest proportion');
+tube('Aorta','Cardiovascular',[new THREE.Vector3(.02,2.55,.57),new THREE.Vector3(.02,2.25,.59),new THREE.Vector3(.16,1.94,.61),new THREE.Vector3(.04,.15,.47)],.042,materials.blood,'Aorta');
+
+// Urinary
+sphere('Left kidney','Urinary',[-.47,.78,.43],[.19,.32,.14],materials.kidney,'Left kidney');
+sphere('Right kidney','Urinary',[.47,.78,.43],[.19,.32,.14],materials.kidney,'Right kidney');
+
+// Cutaway shell: a translucent posterior half that leaves the front open.
+const cutawayGroup=new THREE.Group(); body.add(cutawayGroup);
+const cutMat=new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.16,roughness:.8,side:THREE.DoubleSide});
+const cutShell=new THREE.Mesh(new THREE.SphereGeometry(1,64,40,0,Math.PI*2,0,Math.PI*.58),cutMat);
+cutShell.scale.set(1.08,1.90,.56);cutShell.position.set(0,1.43,-.03);cutShell.rotation.x=Math.PI;cutawayGroup.add(cutShell);
+cutawayGroup.visible=false;
+
+// Food pathway marker
+const pathPoints=[
+ new THREE.Vector3(0,2.58,.72),new THREE.Vector3(.02,2.15,.73),new THREE.Vector3(.08,1.55,.74),new THREE.Vector3(.25,1.22,.75),
+ new THREE.Vector3(.32,1.00,.76),new THREE.Vector3(.15,.88,.76),new THREE.Vector3(.02,.76,.76),new THREE.Vector3(-.32,.58,.76),
+ new THREE.Vector3(-.55,.38,.76),new THREE.Vector3(-.30,.20,.76),new THREE.Vector3(.25,.14,.76),new THREE.Vector3(.55,.25,.76),
+ new THREE.Vector3(.35,.45,.76),new THREE.Vector3(-.25,.50,.76)
+];
+const foodCurve=new THREE.CatmullRomCurve3(pathPoints);
+const pathLine=new THREE.Mesh(new THREE.TubeGeometry(foodCurve,100,.012,8,false),new THREE.MeshBasicMaterial({color:0xffd45a,transparent:true,opacity:.38}));
+pathLine.visible=false;body.add(pathLine);
+
+function makeFoodParticle(){const p=new THREE.Mesh(new THREE.SphereGeometry(.045,16,12),materials.food);p.position.copy(pathPoints[0]);body.add(p);foodParticles.push({mesh:p,t:0});return p;}
+for(let i=0;i<9;i++){const p=makeFoodParticle();p.visible=false;p.userData.offset=i/9;}
+let digestionActive=false;
+function startDigestion(){
+ digestionActive=true; cutawayGroup.visible=true; pathLine.visible=true;
+ foodParticles.forEach((p,i)=>{p.mesh.visible=true;p.t=i/foodParticles.length;});
+ showToast('DIGESTIVE CUTAWAY · FOOD PATH ACTIVE');
+ setSelected('Stomach','Food is traveling from the esophagus into the stomach, then through the intestinal tract.');
+}
+
+// UI state
+const state={cardio:88,gut:80,metabolic:86,inflammation:12};
+function renderMeters(){
+ const vals=[['Cardiovascular',state.cardio],['Gut ecosystem',state.gut],['Metabolic stability',state.metabolic],['Inflammation',100-state.inflammation]];
+ document.getElementById('meters').innerHTML=vals.map(v=>`<div class="meter"><span><b>${v[0]}</b><b>${Math.round(v[1])}%</b></span><div class="bar"><i style="width:${Math.max(0,Math.min(100,v[1]))}%"></i></div></div>`).join('');
+}
+renderMeters();
+function setSelected(name,info){document.getElementById('selected').textContent=name.toUpperCase();document.getElementById('info').textContent=info||'';}
+function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.style.opacity='1';clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.opacity='0',1800);}
+
+const systems=['Body','Skeletal','Digestive','Cardiovascular','Respiratory','Nervous','Urinary'];
+function showSystem(systemName){
+ const showAll=systemName==='Body';
+ Object.entries(groups).forEach(([name,g])=>{g.visible=showAll||name===systemName||name==='Body';});
+ if(systemName==='Digestive') startDigestion();
+ setSelected(systemName==='Body'?'Full body':systemName,systemName==='Body'?'Full layered anatomy':'Isolated '+systemName.toLowerCase()+' system');
+ document.getElementById('focus').textContent=(systemName==='Body'?'FULL BODY':systemName.toUpperCase())+' · '+currentView;
+}
+systems.forEach(s=>{const b=document.createElement('button');b.textContent=s;b.onclick=()=>showSystem(s);document.getElementById('systems').appendChild(b);});
+
+const views={Anterior:[0,1.2,8.5],Posterior:[0,1.2,-8.5],Left:[-8.5,1.2,0],Right:[8.5,1.2,0],Superior:[0,8,.1],Inferior:[0,-6,.1],Oblique:[5,3.2,6]};
+let currentView='ANTERIOR VIEW';
+Object.entries(views).forEach(([name,pos])=>{const b=document.createElement('button');b.textContent=name;b.onclick=()=>{camera.position.set(...pos);controls.target.set(0,1.2,0);controls.update();currentView=name.toUpperCase()+' VIEW';document.getElementById('focus').textContent='FULL BODY · '+currentView;};document.getElementById('views').appendChild(b);});
+
+const foods=[['🥤','Soda',-4,-2,0],['🍔','Burger',-2,-1,1],['🥬','Vegetables',1,1,7],['🐟','Fish',1,1,5],['🫘','Beans',0,0,7]];
+foods.forEach(f=>{const b=document.createElement('button');b.className='food';b.innerHTML=`<b>${f[0]}</b>${f[1]}`;b.onclick=()=>{state.inflammation=Math.max(0,state.inflammation+f[2]);state.metabolic=Math.max(0,Math.min(100,state.metabolic+f[3]));state.gut=Math.max(0,Math.min(100,state.gut+f[4]));renderMeters();startDigestion();showToast(f[1].toUpperCase()+' ENTERED DIGESTIVE PATH');};document.getElementById('foods').appendChild(b);});
+
+document.getElementById('digest').onclick=startDigestion;
+document.getElementById('cutaway').onclick=()=>{cutawayGroup.visible=true;pathLine.visible=true;foodParticles.forEach(p=>p.mesh.visible=true);showToast('CUTAWAY VIEW · FRONT WALL OPEN');};
+document.getElementById('xray').onclick=()=>{Object.entries(groups).forEach(([name,g])=>{g.visible=true;g.traverse(o=>{if(o.material){o.material.transparent=true;o.material.opacity=name==='Body'?.035:.78;}});});cutawayGroup.visible=false;showToast('X-RAY MODE');};
+document.getElementById('reset').onclick=()=>{Object.entries(groups).forEach(([name,g])=>{g.visible=name==='Body'||name==='Skeletal'||name==='Digestive'||name==='Cardiovascular'||name==='Respiratory'||name==='Nervous'||name==='Urinary';g.traverse(o=>{if(o.material&&o.material!==materials.skin)o.material.opacity=1;});});cutawayGroup.visible=false;pathLine.visible=false;foodParticles.forEach(p=>p.mesh.visible=false);digestionActive=false;camera.position.set(0,1.2,8.5);controls.target.set(0,1.2,0);controls.update();currentView='ANTERIOR VIEW';document.getElementById('focus').textContent='FULL BODY · ANTERIOR VIEW';setSelected('Full body','Click an organ to inspect it.');};
+
+// Raycast selection, ignoring the transparent cutaway shell.
+const raycaster=new THREE.Raycaster();const mouse=new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown',e=>{
+ mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);
+ const hits=raycaster.intersectObjects(structures,true).filter(h=>h.object!==cutShell);
+ if(!hits.length)return;
+ let o=hits[0].object;while(o&&!o.userData.name)o=o.parent;
+ if(o&&o.userData.name){setSelected(o.userData.name,o.userData.description);document.getElementById('focus').textContent=o.userData.name.toUpperCase()+' · '+currentView;}
+});
+
+let last=performance.now();
+function animate(now){
+ requestAnimationFrame(animate);const dt=Math.min(.05,(now-last)/1000);last=now;
+ controls.update();
+ const pulse=1+Math.sin(now*.006)*.025;
+ heart.scale.set(pulse,pulse,pulse);
+ if(digestionActive){
+  foodParticles.forEach(p=>{p.t=(p.t+dt*.075)%1;p.mesh.position.copy(foodCurve.getPointAt(p.t));});
+ }
+ renderer.render(scene,camera);
+}
+animate(performance.now());
+
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+</script>
+</body>
+</html>
