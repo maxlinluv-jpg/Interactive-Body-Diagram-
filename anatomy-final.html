@@ -1,238 +1,35 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Diet//Body — Anatomy Visualization</title>
-<style>
-html,body{margin:0;height:100%;overflow:hidden;background:#02050a;color:#edf7ff;font-family:Inter,system-ui,sans-serif}
-#app{position:fixed;inset:0}
-.ui{position:fixed;inset:0;pointer-events:none}
-.panel{pointer-events:auto;position:absolute;background:#050c16d9;border:1px solid #8bdcff25;backdrop-filter:blur(18px);border-radius:18px;padding:15px;box-shadow:0 20px 70px #0008}
-.left{left:18px;top:18px;width:265px}.right{right:18px;top:18px;width:245px}
-.title{font-weight:900;letter-spacing:.2em}.title i{color:#67e8ff;font-style:normal}
-.eyebrow{font-size:8px;letter-spacing:.18em;color:#7188a3;text-transform:uppercase;margin:14px 0 7px}
-.desc{font-size:9px;line-height:1.5;color:#91a4ba}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-button{background:#091523;border:1px solid #20334a;color:#dceafa;border-radius:9px;padding:8px;font-size:8px;cursor:pointer}
-button:hover,button.active{border-color:#60ddff;color:#9eeeff}
-.food{width:100%;text-align:left;margin-top:5px}.food b{font-size:15px;margin-right:5px}
-.meter{margin:8px 0}.meter span{display:flex;justify-content:space-between;font-size:8px}
-.bar{height:4px;background:#122033;border-radius:9px;margin-top:4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#5edcff,#65e5ad)}
-#focus{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.18em;color:#91a6bf;white-space:nowrap}
-.hint{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.15em;color:#6c829d;white-space:nowrap}
-#toast{position:absolute;left:50%;bottom:42px;transform:translateX(-50%);padding:8px 12px;border:1px solid #67e8ff33;border-radius:10px;background:#06111ddd;color:#aeefff;font-size:9px;opacity:0;transition:.25s}
-</style>
-</head>
-<body>
-<div id="app"></div>
-<div class="ui">
-  <div class="panel left">
-    <div class="title">DIET<i>//</i>BODY</div>
-    <div class="eyebrow">Anatomy engine</div>
-    <div class="desc">Explore layered anatomy from multiple angles, then switch to a digestive cutaway to watch food move through the tract.</div>
-    <div class="eyebrow">Systems</div><div id="systems" class="grid"></div>
-    <div class="eyebrow">Camera views</div><div id="views" class="grid"></div>
-    <div class="eyebrow">Food simulation</div><div id="foods"></div>
-  </div>
-  <div class="panel right">
-    <div class="eyebrow">Selected structure</div><b id="selected">FULL BODY</b>
-    <div id="info" class="desc">Click an organ to inspect it.</div>
-    <div class="eyebrow">Modeled state</div><div id="meters"></div>
-    <div class="eyebrow">Visualization</div>
-    <div class="grid">
-      <button id="xray">X-RAY</button><button id="digest">DIGESTION</button>
-      <button id="cutaway">CUTAWAY</button><button id="reset">RESET</button>
-    </div>
-  </div>
-  <div id="focus">FULL BODY · ANTERIOR VIEW</div>
-  <div class="hint">DRAG TO ORBIT · SCROLL TO ZOOM · TRY CUTAWAY</div>
-  <div id="toast"></div>
-</div>
-
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}
-</script>
-<script type="module">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Diet//Body — Digestive System Lab</title><style>
+:root{--bg:#02060b;--panel:#07111cdd;--line:#6fe7ff33;--text:#eaf7ff;--muted:#7f96ad;--cyan:#69e7ff;--gold:#ffd35a}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#app{position:fixed;inset:0}.ui{position:fixed;inset:0;pointer-events:none}.panel{pointer-events:auto;position:absolute;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(18px);border-radius:18px;padding:16px;box-shadow:0 24px 80px #0009}.left{left:18px;top:18px;width:280px}.right{right:18px;top:18px;width:260px}.brand{font-weight:900;letter-spacing:.2em;font-size:14px}.brand i{color:var(--cyan);font-style:normal}.eyebrow{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#7189a2;margin:15px 0 8px}.desc{font-size:9px;line-height:1.55;color:#91a7bb}.food{display:flex;align-items:center;gap:8px;width:100%;margin:6px 0;padding:9px;text-align:left;background:#091724;border:1px solid #20354b;color:#e6f5ff;border-radius:10px;cursor:pointer}.food:hover{border-color:#69e7ff;color:#b8f5ff;transform:translateY(-1px)}.food b{font-size:17px}.food small{display:block;color:#7891a8;font-size:7px;margin-top:2px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}button.ctrl{background:#091724;border:1px solid #20354b;color:#dceefa;border-radius:9px;padding:8px;font-size:8px;cursor:pointer}.ctrl:hover,.ctrl.active{border-color:var(--cyan);color:#b9f6ff}.stat{margin:9px 0}.statline{display:flex;justify-content:space-between;font-size:8px}.bar{height:5px;background:#122235;border-radius:99px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#58dcff,#66e8a8);transition:width .5s}.event{margin-top:12px;padding:9px;border-radius:10px;background:#07121d;border:1px solid #ffffff0b;font-size:8px;line-height:1.5;color:#9bb0c4}.event strong{color:#e9f8ff}.badge{display:inline-block;padding:3px 6px;border-radius:99px;background:#69e7ff14;color:#7eeaff;border:1px solid #69e7ff2b;font-size:7px;letter-spacing:.08em}.top{position:absolute;top:17px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.2em;color:#8fa5bb;white-space:nowrap}.bottom{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.12em;color:#617990;white-space:nowrap}#toast{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);padding:9px 14px;border-radius:11px;background:#061522ee;border:1px solid #69e7ff44;color:#a9efff;font-size:9px;opacity:0;transition:opacity .25s}.path-label{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);color:#ffd35a66;font-size:8px;letter-spacing:.16em;pointer-events:none;opacity:0;transition:opacity .3s}.path-label.on{opacity:1}</style></head>
+<body><div id="app"></div><div class="ui"><div class="panel left"><div class="brand">DIET<i>//</i>BODY</div><div class="eyebrow">Digestive system lab</div><div class="desc">A focused anatomical view of the digestive tract. The body envelope is intentionally subdued so the digestive pathway stays the center of the experience.</div><div class="eyebrow">Eat something</div><button class="food" data-food="Apple"><b>🍎</b><span>Apple<small>fiber + carbohydrate</small></span></button><button class="food" data-food="Vegetables"><b>🥬</b><span>Vegetables<small>fiber + micronutrients</small></span></button><button class="food" data-food="Fish"><b>🐟</b><span>Fish<small>protein + fat</small></span></button><button class="food" data-food="Beans"><b>🫘</b><span>Beans<small>fiber + protein</small></span></button><button class="food" data-food="Soda"><b>🥤</b><span>Soda<small>rapid carbohydrate</small></span></button><div class="eyebrow">View</div><div class="grid"><button class="ctrl active" id="cut">CUTAWAY</button><button class="ctrl" id="front">FRONT</button><button class="ctrl" id="side">SIDE</button><button class="ctrl" id="reset">RESET</button></div></div><div class="panel right"><div class="eyebrow">Current journey</div><div id="journey"><span class="badge">WAITING</span></div><div class="eyebrow">Digestive state</div><div class="stat"><div class="statline"><span>Stomach activity</span><b id="stomachV">0%</b></div><div class="bar"><i id="stomachB"></i></div></div><div class="stat"><div class="statline"><span>Intestinal activity</span><b id="intestineV">0%</b></div><div class="bar"><i id="intestineB"></i></div></div><div class="stat"><div class="statline"><span>Absorption</span><b id="absorbV">0%</b></div><div class="bar"><i id="absorbB"></i></div></div><div class="event" id="event"><strong>Ready.</strong><br>Click a food to start a single visible journey through the digestive tract.</div><div class="eyebrow">Anatomy</div><div class="desc">Esophagus → stomach → small intestine → large intestine. Accessory digestive organs are shown around the tract without introducing unrelated body systems.</div></div><div class="top" id="top">DIGESTIVE SYSTEM · CUTAWAY</div><div class="path-label" id="pathLabel">FOOD PATH</div><div class="bottom">DRAG TO ORBIT · SCROLL TO ZOOM · CLICK FOOD TO BEGIN</div><div id="toast"></div></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script><script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
-
-const app=document.getElementById('app');
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x02050a);
-scene.fog=new THREE.Fog(0x02050a,9,18);
-
-const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.1,100);
-camera.position.set(0,1.2,8.5);
-
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
-app.appendChild(renderer.domElement);
-
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true; controls.dampingFactor=.07; controls.enablePan=false;
-controls.minDistance=3.2; controls.maxDistance=13; controls.target.set(0,1.25,0);
-
-scene.add(new THREE.HemisphereLight(0xbde7ff,0x080b14,1.35));
-const key=new THREE.PointLight(0x58ddff,65,18); key.position.set(4,5,5); scene.add(key);
-const fill=new THREE.PointLight(0x9b63ff,28,14); fill.position.set(-4,2,-3); scene.add(fill);
-
-const body=new THREE.Group(); body.position.y=-.55; scene.add(body);
-const groups={}; const structures=[]; const digestiveParts=[]; const foodParticles=[];
-const materials={
- skin:new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.10,roughness:.72,clearcoat:.25,side:THREE.DoubleSide}),
- bone:new THREE.MeshPhysicalMaterial({color:0xe0e8ee,transparent:true,opacity:.38,roughness:.5,side:THREE.DoubleSide}),
- heart:new THREE.MeshPhysicalMaterial({color:0xe83d5a,roughness:.32,clearcoat:.45,emissive:0x3b0710,emissiveIntensity:.3}),
- lung:new THREE.MeshPhysicalMaterial({color:0x9b6678,transparent:true,opacity:.82,roughness:.48,side:THREE.DoubleSide}),
- liver:new THREE.MeshPhysicalMaterial({color:0xa95540,roughness:.42,clearcoat:.25}),
- stomach:new THREE.MeshPhysicalMaterial({color:0xe5748b,roughness:.4,clearcoat:.3}),
- gut:new THREE.MeshPhysicalMaterial({color:0x55dfa2,roughness:.38,clearcoat:.35,emissive:0x0a2d1f,emissiveIntensity:.2}),
- kidney:new THREE.MeshPhysicalMaterial({color:0x873448,roughness:.4}),
- brain:new THREE.MeshPhysicalMaterial({color:0xb174ff,roughness:.42,clearcoat:.3,emissive:0x170b2d,emissiveIntensity:.25}),
- blood:new THREE.MeshBasicMaterial({color:0xff4562}),
- food:new THREE.MeshStandardMaterial({color:0xffc857,emissive:0x8a4c00,emissiveIntensity:1.4})
-};
-
-function group(name){if(!groups[name]){groups[name]=new THREE.Group();body.add(groups[name]);}return groups[name];}
-function register(name,system,obj,description,container){obj.userData.name=name;obj.userData.system=system;obj.userData.description=description;structures.push(obj);group(system).add(obj);if(container)container.push(obj);return obj;}
-function sphere(name,system,pos,scale,material,description,container){const o=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),material);o.position.set(...pos);o.scale.set(...scale);return register(name,system,o,description,container);}
-function tube(name,system,points,radius,material,description,container){const curve=new THREE.CatmullRomCurve3(points);const o=new THREE.Mesh(new THREE.TubeGeometry(curve,64,radius,14,false),material);return register(name,system,o,description,container);}
-
-// Body envelope and limbs
-sphere('Body surface','Body',[0,1.45,0],[1.03,1.82,.52],materials.skin,'Transparent body envelope');
-sphere('Head','Body',[0,3.42,0],[.61,.69,.52],materials.skin,'Head and neck region');
-sphere('Left arm','Body',[-1.03,1.42,0],[.22,.95,.24],materials.skin,'Left arm');
-sphere('Right arm','Body',[1.03,1.42,0],[.22,.95,.24],materials.skin,'Right arm');
-sphere('Left leg','Body',[-.37,-.55,0],[.31,1.27,.32],materials.skin,'Left leg');
-sphere('Right leg','Body',[.37,-.55,0],[.31,1.27,.32],materials.skin,'Right leg');
-
-// Skeleton
-const ribs=group('Skeletal');
-ribs.userData={name:'Rib cage',system:'Skeletal',description:'Protective thoracic cage'}; structures.push(ribs);
-for(let y=1.22;y<2.42;y+=.22){const r=new THREE.Mesh(new THREE.TorusGeometry(.76,.023,8,64,Math.PI),materials.bone);r.rotation.x=Math.PI/2;r.scale.set(1,.72,1);r.position.set(0,y,.03);ribs.add(r);}
-tube('Spine','Skeletal',[new THREE.Vector3(0,2.55,-.1),new THREE.Vector3(0,1.35,-.1),new THREE.Vector3(0,.12,-.08)],.038,materials.bone,'Spinal column');
-
-// Nervous
-sphere('Brain','Nervous',[0,3.42,.48],[.47,.4,.25],materials.brain,'Brain');
-for(let i=0;i<7;i++){
- const line=[]; const y=3.25+i*.055;
- line.push(new THREE.Vector3(-.34,y,.67),new THREE.Vector3(0,y+.03,.70),new THREE.Vector3(.34,y,.67));
- tube('Brain fold '+(i+1),'Nervous',line,.009,materials.brain,'Brain surface fold');
-}
-
-// Respiratory
-const lungL=sphere('Left lung','Respiratory',[-.38,1.98,.46],[.32,.70,.23],materials.lung,'Left lung');
-const lungR=sphere('Right lung','Respiratory',[.38,1.98,.46],[.32,.70,.23],materials.lung,'Right lung');
-tube('Trachea','Respiratory',[new THREE.Vector3(0,2.68,.5),new THREE.Vector3(0,2.35,.5)],.045,materials.lung,'Trachea');
-
-// Digestive tract: a deliberately clear, vertically oriented path
-const esophagus=tube('Esophagus','Digestive',[new THREE.Vector3(0,2.62,.57),new THREE.Vector3(.02,2.15,.58),new THREE.Vector3(.08,1.55,.59),new THREE.Vector3(.25,1.22,.60)],.055,materials.stomach,'Food passage from throat to stomach',digestiveParts);
-const liver=sphere('Liver','Digestive',[-.28,1.30,.50],[.70,.34,.23],materials.liver,'Liver');
-const stomach=sphere('Stomach','Digestive',[.30,.92,.57],[.39,.52,.23],materials.stomach,'Stomach — food storage and digestion',digestiveParts);
-sphere('Pancreas','Digestive',[.04,.82,.59],[.50,.11,.10],materials.pan,'Pancreas');
-const intestines=group('Digestive');
-intestines.userData={name:'Intestines',system:'Digestive',description:'Small and large intestine'};structures.push(intestines);digestiveParts.push(intestines);
-for(let r=0;r<6;r++)for(let c=0;c<5;c++){
- const q=new THREE.Mesh(new THREE.TorusGeometry(.15,.038,10,42,Math.PI*1.82),materials.gut);
- q.position.set(-.60+c*.30,.03+r*.13,.55);q.rotation.x=Math.PI/2;intestines.add(q);
-}
-tube('Colon','Digestive',[new THREE.Vector3(-.62,.02,.58),new THREE.Vector3(-.62,.75,.58),new THREE.Vector3(.62,.75,.58),new THREE.Vector3(.62,.02,.58)],.055,materials.gut,'Large intestine',digestiveParts);
-
-// Cardiovascular
-const heart=sphere('Heart','Cardiovascular',[.16,1.94,.60],[.24,.31,.18],materials.heart,'Heart — reduced chest proportion');
-tube('Aorta','Cardiovascular',[new THREE.Vector3(.02,2.55,.57),new THREE.Vector3(.02,2.25,.59),new THREE.Vector3(.16,1.94,.61),new THREE.Vector3(.04,.15,.47)],.042,materials.blood,'Aorta');
-
-// Urinary
-sphere('Left kidney','Urinary',[-.47,.78,.43],[.19,.32,.14],materials.kidney,'Left kidney');
-sphere('Right kidney','Urinary',[.47,.78,.43],[.19,.32,.14],materials.kidney,'Right kidney');
-
-// Cutaway shell: a translucent posterior half that leaves the front open.
-const cutawayGroup=new THREE.Group(); body.add(cutawayGroup);
-const cutMat=new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.16,roughness:.8,side:THREE.DoubleSide});
-const cutShell=new THREE.Mesh(new THREE.SphereGeometry(1,64,40,0,Math.PI*2,0,Math.PI*.58),cutMat);
-cutShell.scale.set(1.08,1.90,.56);cutShell.position.set(0,1.43,-.03);cutShell.rotation.x=Math.PI;cutawayGroup.add(cutShell);
-cutawayGroup.visible=false;
-
-// Food pathway marker
-const pathPoints=[
- new THREE.Vector3(0,2.58,.72),new THREE.Vector3(.02,2.15,.73),new THREE.Vector3(.08,1.55,.74),new THREE.Vector3(.25,1.22,.75),
- new THREE.Vector3(.32,1.00,.76),new THREE.Vector3(.15,.88,.76),new THREE.Vector3(.02,.76,.76),new THREE.Vector3(-.32,.58,.76),
- new THREE.Vector3(-.55,.38,.76),new THREE.Vector3(-.30,.20,.76),new THREE.Vector3(.25,.14,.76),new THREE.Vector3(.55,.25,.76),
- new THREE.Vector3(.35,.45,.76),new THREE.Vector3(-.25,.50,.76)
-];
-const foodCurve=new THREE.CatmullRomCurve3(pathPoints);
-const pathLine=new THREE.Mesh(new THREE.TubeGeometry(foodCurve,100,.012,8,false),new THREE.MeshBasicMaterial({color:0xffd45a,transparent:true,opacity:.38}));
-pathLine.visible=false;body.add(pathLine);
-
-function makeFoodParticle(){const p=new THREE.Mesh(new THREE.SphereGeometry(.045,16,12),materials.food);p.position.copy(pathPoints[0]);body.add(p);foodParticles.push({mesh:p,t:0});return p;}
-for(let i=0;i<9;i++){const p=makeFoodParticle();p.visible=false;p.userData.offset=i/9;}
-let digestionActive=false;
-function startDigestion(){
- digestionActive=true; cutawayGroup.visible=true; pathLine.visible=true;
- foodParticles.forEach((p,i)=>{p.mesh.visible=true;p.t=i/foodParticles.length;});
- showToast('DIGESTIVE CUTAWAY · FOOD PATH ACTIVE');
- setSelected('Stomach','Food is traveling from the esophagus into the stomach, then through the intestinal tract.');
-}
-
-// UI state
-const state={cardio:88,gut:80,metabolic:86,inflammation:12};
-function renderMeters(){
- const vals=[['Cardiovascular',state.cardio],['Gut ecosystem',state.gut],['Metabolic stability',state.metabolic],['Inflammation',100-state.inflammation]];
- document.getElementById('meters').innerHTML=vals.map(v=>`<div class="meter"><span><b>${v[0]}</b><b>${Math.round(v[1])}%</b></span><div class="bar"><i style="width:${Math.max(0,Math.min(100,v[1]))}%"></i></div></div>`).join('');
-}
-renderMeters();
-function setSelected(name,info){document.getElementById('selected').textContent=name.toUpperCase();document.getElementById('info').textContent=info||'';}
-function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.style.opacity='1';clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.style.opacity='0',1800);}
-
-const systems=['Body','Skeletal','Digestive','Cardiovascular','Respiratory','Nervous','Urinary'];
-function showSystem(systemName){
- const showAll=systemName==='Body';
- Object.entries(groups).forEach(([name,g])=>{g.visible=showAll||name===systemName||name==='Body';});
- if(systemName==='Digestive') startDigestion();
- setSelected(systemName==='Body'?'Full body':systemName,systemName==='Body'?'Full layered anatomy':'Isolated '+systemName.toLowerCase()+' system');
- document.getElementById('focus').textContent=(systemName==='Body'?'FULL BODY':systemName.toUpperCase())+' · '+currentView;
-}
-systems.forEach(s=>{const b=document.createElement('button');b.textContent=s;b.onclick=()=>showSystem(s);document.getElementById('systems').appendChild(b);});
-
-const views={Anterior:[0,1.2,8.5],Posterior:[0,1.2,-8.5],Left:[-8.5,1.2,0],Right:[8.5,1.2,0],Superior:[0,8,.1],Inferior:[0,-6,.1],Oblique:[5,3.2,6]};
-let currentView='ANTERIOR VIEW';
-Object.entries(views).forEach(([name,pos])=>{const b=document.createElement('button');b.textContent=name;b.onclick=()=>{camera.position.set(...pos);controls.target.set(0,1.2,0);controls.update();currentView=name.toUpperCase()+' VIEW';document.getElementById('focus').textContent='FULL BODY · '+currentView;};document.getElementById('views').appendChild(b);});
-
-const foods=[['🥤','Soda',-4,-2,0],['🍔','Burger',-2,-1,1],['🥬','Vegetables',1,1,7],['🐟','Fish',1,1,5],['🫘','Beans',0,0,7]];
-foods.forEach(f=>{const b=document.createElement('button');b.className='food';b.innerHTML=`<b>${f[0]}</b>${f[1]}`;b.onclick=()=>{state.inflammation=Math.max(0,state.inflammation+f[2]);state.metabolic=Math.max(0,Math.min(100,state.metabolic+f[3]));state.gut=Math.max(0,Math.min(100,state.gut+f[4]));renderMeters();startDigestion();showToast(f[1].toUpperCase()+' ENTERED DIGESTIVE PATH');};document.getElementById('foods').appendChild(b);});
-
-document.getElementById('digest').onclick=startDigestion;
-document.getElementById('cutaway').onclick=()=>{cutawayGroup.visible=true;pathLine.visible=true;foodParticles.forEach(p=>p.mesh.visible=true);showToast('CUTAWAY VIEW · FRONT WALL OPEN');};
-document.getElementById('xray').onclick=()=>{Object.entries(groups).forEach(([name,g])=>{g.visible=true;g.traverse(o=>{if(o.material){o.material.transparent=true;o.material.opacity=name==='Body'?.035:.78;}});});cutawayGroup.visible=false;showToast('X-RAY MODE');};
-document.getElementById('reset').onclick=()=>{Object.entries(groups).forEach(([name,g])=>{g.visible=name==='Body'||name==='Skeletal'||name==='Digestive'||name==='Cardiovascular'||name==='Respiratory'||name==='Nervous'||name==='Urinary';g.traverse(o=>{if(o.material&&o.material!==materials.skin)o.material.opacity=1;});});cutawayGroup.visible=false;pathLine.visible=false;foodParticles.forEach(p=>p.mesh.visible=false);digestionActive=false;camera.position.set(0,1.2,8.5);controls.target.set(0,1.2,0);controls.update();currentView='ANTERIOR VIEW';document.getElementById('focus').textContent='FULL BODY · ANTERIOR VIEW';setSelected('Full body','Click an organ to inspect it.');};
-
-// Raycast selection, ignoring the transparent cutaway shell.
-const raycaster=new THREE.Raycaster();const mouse=new THREE.Vector2();
-renderer.domElement.addEventListener('pointerdown',e=>{
- mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);
- const hits=raycaster.intersectObjects(structures,true).filter(h=>h.object!==cutShell);
- if(!hits.length)return;
- let o=hits[0].object;while(o&&!o.userData.name)o=o.parent;
- if(o&&o.userData.name){setSelected(o.userData.name,o.userData.description);document.getElementById('focus').textContent=o.userData.name.toUpperCase()+' · '+currentView;}
-});
-
-let last=performance.now();
-function animate(now){
- requestAnimationFrame(animate);const dt=Math.min(.05,(now-last)/1000);last=now;
- controls.update();
- const pulse=1+Math.sin(now*.006)*.025;
- heart.scale.set(pulse,pulse,pulse);
- if(digestionActive){
-  foodParticles.forEach(p=>{p.t=(p.t+dt*.075)%1;p.mesh.position.copy(foodCurve.getPointAt(p.t));});
- }
- renderer.render(scene,camera);
-}
-animate(performance.now());
-
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-</script>
-</body>
-</html>
+const app=document.getElementById('app'),scene=new THREE.Scene();scene.background=new THREE.Color(0x02060b);scene.fog=new THREE.Fog(0x02060b,9,17);
+const camera=new THREE.PerspectiveCamera(32,innerWidth/innerHeight,.1,100);camera.position.set(0,1.25,8.6);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;app.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.07;controls.enablePan=false;controls.minDistance=3;controls.maxDistance=13;controls.target.set(0,1.2,0);
+scene.add(new THREE.HemisphereLight(0xbdeaff,0x050811,1.35));const light1=new THREE.PointLight(0x55ddff,60,18);light1.position.set(4,5,5);scene.add(light1);const light2=new THREE.PointLight(0xff7b59,24,12);light2.position.set(-4,1,3);scene.add(light2);
+const root=new THREE.Group();root.position.y=-.55;scene.add(root),anatomy=new THREE.Group(),foodGroup=new THREE.Group();root.add(anatomy,foodGroup);
+const mats={envelope:new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.055,roughness:.75,side:THREE.DoubleSide}),wall:new THREE.MeshPhysicalMaterial({color:0xe6b3a1,roughness:.46,clearcoat:.25,side:THREE.DoubleSide}),inner:new THREE.MeshPhysicalMaterial({color:0xd87872,roughness:.52,side:THREE.DoubleSide}),liver:new THREE.MeshPhysicalMaterial({color:0x984c3b,roughness:.4,clearcoat:.3}),pancreas:new THREE.MeshPhysicalMaterial({color:0xd9a365,roughness:.43,clearcoat:.2}),bile:new THREE.MeshBasicMaterial({color:0x91d63f}),vessel:new THREE.MeshBasicMaterial({color:0xb84845}),food:new THREE.MeshStandardMaterial({color:0xffc94f,emissive:0x8b4b00,emissiveIntensity:1.7,roughness:.35}),nutrient:new THREE.MeshBasicMaterial({color:0x6ee7ff}),cut:new THREE.MeshPhysicalMaterial({color:0x7895aa,transparent:true,opacity:.075,roughness:.8,side:THREE.DoubleSide})};
+function tube(points,r,mat,segments=80){return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),segments,r,16,false),mat)}
+function addTube(points,r,mat){const m=tube(points,r,mat);anatomy.add(m);return m}
+function rounded(name,pos,scale,mat){const m=new THREE.Mesh(new THREE.SphereGeometry(1,56,40),mat);m.position.set(...pos);m.scale.set(...scale);m.name=name;anatomy.add(m);return m}
+rounded('Thorax envelope',[0,1.58,0],[1.02,1.72,.50],mats.envelope);rounded('Head envelope',[0,3.38,0],[.58,.66,.48],mats.envelope);
+const mouth=rounded('Oral cavity',[0,3.30,.49],[.16,.09,.07],mats.inner);
+addTube([new THREE.Vector3(0,3.27,.48),new THREE.Vector3(0,2.90,.55),new THREE.Vector3(.02,2.42,.58),new THREE.Vector3(.08,1.63,.61),new THREE.Vector3(.22,1.25,.63)],.075,mats.wall);addTube([new THREE.Vector3(0,3.27,.555),new THREE.Vector3(0,2.90,.62),new THREE.Vector3(.02,2.42,.65),new THREE.Vector3(.08,1.63,.68),new THREE.Vector3(.22,1.25,.70)],.035,mats.inner);
+const liver=rounded('Liver',[-.28,1.36,.39],[.72,.38,.25],mats.liver);liver.rotation.z=-.12;const liver2=rounded('Liver lobe',[.28,1.31,.40],[.40,.29,.22],mats.liver);liver2.rotation.z=.15;const gall=rounded('Gallbladder',[.24,1.02,.60],[.095,.16,.085],mats.bile);addTube([new THREE.Vector3(.24,1.08,.62),new THREE.Vector3(.19,.96,.66),new THREE.Vector3(.18,.86,.67)],.012,mats.bile,30);
+const stomachOuter=rounded('Stomach',[.30,.92,.58],[.42,.55,.28],mats.wall);stomachOuter.rotation.z=-.18;const stomachInner=rounded('Stomach lumen',[.30,.92,.805],[.29,.39,.055],mats.inner);stomachInner.rotation.z=-.18;
+for(let i=0;i<7;i++){const y=.70+i*.075;addTube([new THREE.Vector3(.18,y,.865),new THREE.Vector3(.30,y+.025,.89),new THREE.Vector3(.42,y-.01,.865)],.009,new THREE.MeshBasicMaterial({color:0xf5a09a,transparent:true,opacity:.65}),18)}
+addTube([new THREE.Vector3(.55,.83,.65),new THREE.Vector3(.70,.70,.67),new THREE.Vector3(.57,.55,.69),new THREE.Vector3(.30,.48,.70)],.07,mats.wall);const pancreas=rounded('Pancreas',[.02,.75,.36],[.54,.11,.10],mats.pancreas);pancreas.rotation.z=-.08;
+const smallCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(.25,.50,.70),new THREE.Vector3(.48,.38,.70),new THREE.Vector3(.38,.25,.70),new THREE.Vector3(.04,.19,.70),new THREE.Vector3(-.35,.27,.70),new THREE.Vector3(-.48,.43,.70),new THREE.Vector3(-.35,.57,.70),new THREE.Vector3(0,.62,.70),new THREE.Vector3(.34,.54,.70),new THREE.Vector3(.48,.40,.70),new THREE.Vector3(.30,.28,.70),new THREE.Vector3(-.08,.26,.70),new THREE.Vector3(-.45,.36,.70),new THREE.Vector3(-.42,.50,.70),new THREE.Vector3(-.16,.66,.70),new THREE.Vector3(.22,.69,.70),new THREE.Vector3(.45,.59,.70),new THREE.Vector3(.42,.43,.70),new THREE.Vector3(.10,.36,.70),new THREE.Vector3(-.30,.42,.70)]);
+const small=new THREE.Mesh(new THREE.TubeGeometry(smallCurve,180,.075,18,false),mats.wall);small.name='Small intestine';anatomy.add(small);const smallLumen=new THREE.Mesh(new THREE.TubeGeometry(smallCurve,180,.034,14,false),mats.inner);smallLumen.position.z=.012;smallLumen.name='Small intestine lumen';anatomy.add(smallLumen);
+const colonCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(-.63,.12,.70),new THREE.Vector3(-.68,.55,.70),new THREE.Vector3(-.63,.79,.70),new THREE.Vector3(-.40,.87,.70),new THREE.Vector3(0,.88,.70),new THREE.Vector3(.42,.84,.70),new THREE.Vector3(.64,.66,.70),new THREE.Vector3(.65,.38,.70),new THREE.Vector3(.56,.13,.70)]);const colon=new THREE.Mesh(new THREE.TubeGeometry(colonCurve,140,.105,18,false),mats.wall);colon.name='Large intestine';anatomy.add(colon);const colonLumen=new THREE.Mesh(new THREE.TubeGeometry(colonCurve,140,.048,14,false),mats.inner);colonLumen.position.z=.02;colonLumen.name='Large intestine lumen';anatomy.add(colonLumen);addTube([new THREE.Vector3(.56,.13,.70),new THREE.Vector3(.48,-.08,.70),new THREE.Vector3(.42,-.28,.70)],.09,mats.wall,50);
+for(let i=0;i<8;i++){const x=-.48+i*.13;addTube([new THREE.Vector3(x,.08,.48),new THREE.Vector3(x*.65,.38,.53),new THREE.Vector3(x*.25,.62,.57)],.009,mats.vessel,24)}
+const cutGroup=new THREE.Group();root.add(cutGroup);const shell=new THREE.Mesh(new THREE.SphereGeometry(1,64,44,0,Math.PI*2,0,Math.PI*.62),mats.cut);shell.scale.set(1.07,1.86,.55);shell.position.set(0,1.42,-.02);shell.rotation.x=Math.PI;cutGroup.add(shell);
+const pathPoints=[new THREE.Vector3(0,3.27,.72),new THREE.Vector3(0,2.90,.72),new THREE.Vector3(.02,2.42,.75),new THREE.Vector3(.08,1.63,.78),new THREE.Vector3(.22,1.25,.79),new THREE.Vector3(.52,.88,.80),new THREE.Vector3(.47,.67,.81),new THREE.Vector3(.20,.53,.82),new THREE.Vector3(-.25,.44,.82),new THREE.Vector3(-.46,.30,.82),new THREE.Vector3(-.25,.22,.82),new THREE.Vector3(.12,.29,.82),new THREE.Vector3(.42,.40,.82),new THREE.Vector3(.25,.54,.82),new THREE.Vector3(-.18,.62,.82),new THREE.Vector3(-.45,.52,.82),new THREE.Vector3(-.53,.34,.82),new THREE.Vector3(-.20,.16,.82),new THREE.Vector3(.30,.12,.82),new THREE.Vector3(.48,-.08,.82),new THREE.Vector3(.42,-.28,.82)];const pathCurve=new THREE.CatmullRomCurve3(pathPoints);const pathTube=new THREE.Mesh(new THREE.TubeGeometry(pathCurve,220,.013,8,false),new THREE.MeshBasicMaterial({color:0xffd35a,transparent:true,opacity:.55}));pathTube.visible=false;root.add(pathTube);
+const particles=[];for(let i=0;i<8;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.052,18,12),mats.food);p.visible=false;foodGroup.add(p);particles.push({mesh:p,progress:0})}const nutrientParticles=[];for(let i=0;i<12;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.022,12,8),mats.nutrient);p.visible=false;foodGroup.add(p);nutrientParticles.push({mesh:p,life:0,seed:i})}
+let active=false,foodName='',elapsed=0,toastTimer=0;const journey=document.getElementById('journey'),eventBox=document.getElementById('event');function setBar(id,v){document.getElementById(id+'V').textContent=Math.round(v)+'%';document.getElementById(id+'B').style.width=v+'%'}function showToast(t){const e=document.getElementById('toast');e.textContent=t;e.style.opacity='1';toastTimer=2.2}function startFood(name){foodName=name;active=true;elapsed=0;pathTube.visible=true;document.getElementById('pathLabel').classList.add('on');particles.forEach((p,i)=>{p.mesh.visible=true;p.progress=-i*.08});nutrientParticles.forEach(p=>p.mesh.visible=false);journey.innerHTML='<span class="badge">TRAVELING</span> '+name.toUpperCase();eventBox.innerHTML='<strong>'+name+' selected.</strong><br>The food bolus is moving down the visible digestive pathway. Watch the particles pass from the esophagus into the stomach and intestines.';showToast(name+' · digestive journey started')}
+document.querySelectorAll('.food').forEach(b=>b.addEventListener('click',()=>startFood(b.dataset.food)));document.getElementById('cut').addEventListener('click',()=>{cutGroup.visible=true;document.getElementById('top').textContent='DIGESTIVE SYSTEM · CUTAWAY';document.getElementById('cut').classList.add('active');document.getElementById('front').classList.remove('active');document.getElementById('side').classList.remove('active')});document.getElementById('front').addEventListener('click',()=>{cutGroup.visible=false;camera.position.set(0,1.25,8.6);controls.target.set(0,1.2,0);controls.update();document.getElementById('top').textContent='DIGESTIVE SYSTEM · FRONT';document.getElementById('front').classList.add('active');document.getElementById('cut').classList.remove('active');document.getElementById('side').classList.remove('active')});document.getElementById('side').addEventListener('click',()=>{cutGroup.visible=false;camera.position.set(8.2,1.25,.25);controls.target.set(0,1.15,0);controls.update();document.getElementById('top').textContent='DIGESTIVE SYSTEM · LATERAL';document.getElementById('side').classList.add('active');document.getElementById('cut').classList.remove('active');document.getElementById('front').classList.remove('active')});document.getElementById('reset').addEventListener('click',()=>{active=false;elapsed=0;pathTube.visible=false;document.getElementById('pathLabel').classList.remove('on');particles.forEach(p=>p.mesh.visible=false);nutrientParticles.forEach(p=>p.mesh.visible=false);journey.innerHTML='<span class="badge">WAITING</span>';eventBox.innerHTML='<strong>Ready.</strong><br>Click a food to start a single visible journey through the digestive tract.';setBar('stomach',0);setBar('intestine',0);setBar('absorb',0)});
+let last=performance.now();function animate(now){requestAnimationFrame(animate);const dt=Math.min(.05,(now-last)/1000);last=now;elapsed+=dt;controls.update();if(active){particles.forEach(p=>{p.progress+=dt*.075;if(p.progress>1)p.progress=1;const u=Math.max(0,Math.min(1,p.progress));p.mesh.position.copy(pathCurve.getPointAt(u));p.mesh.scale.setScalar(.85+Math.sin(now*.01)*.18);if(u>=1)p.mesh.visible=false});const u=Math.min(1,Math.max(0,elapsed*.075));setBar('stomach',Math.min(100,u*155));setBar('intestine',Math.max(0,(u-.22)*128));setBar('absorb',Math.max(0,(u-.42)*173));nutrientParticles.forEach((p,i)=>{if(u>.43){p.mesh.visible=true;p.life+=dt*.35;const t=(p.life+i*.17)%1;p.mesh.position.set(-.25+Math.sin(t*9+i)*.28,.5+Math.cos(t*7+i)*.35,.65+t*.65);p.mesh.scale.setScalar(.7+Math.sin(t*8)*.3)}});if(u>=1){active=false;journey.innerHTML='<span class="badge">ARRIVED</span> '+foodName.toUpperCase();eventBox.innerHTML='<strong>'+foodName+' completed the visible pathway.</strong><br>The particles reached the end of the modeled tract. This is an educational visualization, not a medical prediction.';showToast('Journey complete')}}const pulse=1+Math.sin(now*.0032)*.012;stomachOuter.scale.y=.55*pulse;stomachInner.scale.y=.39*pulse;renderer.render(scene,camera);if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)document.getElementById('toast').style.opacity='0'}}requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
