@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diet//Body — Digestive Asset Preview</title>
+<style>
+:root{color-scheme:dark;--bg:#050910;--panel:#0b1421;--line:#20354a;--cyan:#6ce7ff;--muted:#91a5ba}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#edf7ff;font:14px Inter,system-ui,sans-serif}#scene{position:fixed;inset:0}canvas{display:block}.panel{position:fixed;top:16px;left:16px;width:min(360px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:#081321ef;border:1px solid var(--line);border-radius:16px;padding:16px;backdrop-filter:blur(12px)}h1{font-size:16px;margin:0 0 8px;letter-spacing:.08em}p{font-size:12px;color:var(--muted);line-height:1.5}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff10;font-size:12px}.status{color:#f6c76b}.ok{color:#76e5ad}.controls{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}button{border:1px solid var(--line);border-radius:9px;background:#101f30;color:#eaf7ff;padding:9px;cursor:pointer}button:hover{border-color:var(--cyan)}.hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.1em;color:#a0b6cb;white-space:nowrap;background:#07111dcc;padding:8px 12px;border-radius:8px}.small{font-size:11px}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<section class="panel">
+<h1>DIGESTIVE ASSET PREVIEW</h1>
+<p>Load real GLB assets into one scene and tune their transforms. Place licensed models in <code>assets/anatomy/digestive/</code>. Missing files will be reported below.</p>
+<div id="assets"></div>
+<div class="controls"><button id="reset">Reset view</button><button id="togglePath">Toggle food path</button></div>
+<p class="small">Drag to rotate · scroll to zoom · click a loaded mesh to identify it. The initial transform presets are approximate and need visual adjustment.</p>
+</section>
+<div class="hint">ASSET STAGING VIEW · NOT FINAL ANATOMY</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+const root=document.querySelector('#scene');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x050910);scene.fog=new THREE.FogExp2(0x050910,.025);
+const camera=new THREE.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(0,1.2,7);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;root.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,.8,0);controls.minDistance=2;controls.maxDistance=14;controls.enablePan=true;
+scene.add(new THREE.HemisphereLight(0xc4e7ff,0x17101a,2));const key=new THREE.DirectionalLight(0xffe8d4,3);key.position.set(4,6,5);scene.add(key);const rim=new THREE.PointLight(0x4cdfff,35,15);rim.position.set(-4,2,-3);scene.add(rim);
+const group=new THREE.Group();scene.add(group);const loader=new GLTFLoader();const loaded=[];const assetsEl=document.querySelector('#assets');
+const presets=[
+{name:'Liver',file:'assets/anatomy/digestive/liver.glb',position:[-.42,1.35,.18],rotation:[0,0,-.08],scale:1},
+{name:'Large intestine',file:'assets/anatomy/digestive/large-intestine.glb',position:[0,.35,.15],rotation:[0,0,0],scale:1},
+{name:'Mouth',file:'assets/anatomy/digestive/mouth.glb',position:[0,2.75,.2],rotation:[0,0,0],scale:1},
+{name:'Anal canal',file:'assets/anatomy/digestive/anal-canal.glb',position:[0,-.65,.2],rotation:[0,0,0],scale:1}
+];
+const makeRow=(name,status,ok=false)=>{const el=document.createElement('div');el.className='row';const n=document.createElement('span');n.textContent=name;const s=document.createElement('span');s.className=ok?'ok':'status';s.textContent=status;el.append(n,s);assetsEl.append(el)};
+const floor=new THREE.GridHelper(5,20,0x29445b,0x142637);floor.position.y=-1.05;scene.add(floor);
+for(const preset of presets){makeRow(preset.name,'Loading…');loader.load(preset.file,gltf=>{const obj=gltf.scene;obj.name=preset.name;obj.position.set(...preset.position);obj.rotation.set(...preset.rotation);obj.scale.setScalar(preset.scale);obj.traverse(n=>{if(n.isMesh){n.userData.assetName=preset.name;if(n.material)n.material.side=THREE.DoubleSide}});group.add(obj);loaded.push(obj);const row=[...assetsEl.children].find(el=>el.firstChild?.textContent===preset.name);if(row){row.lastChild.textContent='Loaded';row.lastChild.className='ok'}},undefined,()=>{const row=[...assetsEl.children].find(el=>el.firstChild?.textContent===preset.name);if(row){row.lastChild.textContent='File not found';row.lastChild.className='status'}})}
+// Visual guide for the intended digestive route; this is not a replacement for anatomy meshes.
+const pathPoints=[[0,2.65,.35],[0,2.1,.35],[.05,1.65,.35],[.15,1.25,.35],[.2,.95,.35],[.35,.6,.35],[-.15,.45,.35],[.25,.25,.35],[-.45,.1,.35],[-.55,-.15,.35],[-.2,-.4,.35],[0,-.72,.35]].map(p=>new THREE.Vector3(...p));
+const pathCurve=new THREE.CatmullRomCurve3(pathPoints);const pathMesh=new THREE.Mesh(new THREE.TubeGeometry(pathCurve,120,.018,8,false),new THREE.MeshBasicMaterial({color:0x62e8c0,transparent:true,opacity:.7}));scene.add(pathMesh);let pathVisible=true;
+const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();renderer.domElement.addEventListener('pointerdown',e=>{pointer.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(loaded,true);if(hits.length){const name=hits[0].object.userData.assetName;document.querySelector('.hint').textContent=(name||'ANATOMY')+' · SELECTED'}});
+document.querySelector('#reset').onclick=()=>{camera.position.set(0,1.2,7);controls.target.set(0,.8,0);controls.update()};
+document.querySelector('#togglePath').onclick=()=>{pathVisible=!pathVisible;pathMesh.visible=pathVisible};
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
