@@ -11,6 +11,66 @@
 @media(max-width:980px){.layout{grid-template-columns:1fr}.visual-stage{min-height:0}.anatomy-svg{min-height:0;max-height:700px}.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}.controls .food-section{grid-row:span 2}.controls .timeline{grid-column:1/-1}.bottom-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.shell{padding:12px}.topbar{align-items:flex-start}.topmeta{display:none}.intro{align-items:flex-start;flex-direction:column}.time-chip{width:100%}.visual-head{align-items:flex-start;flex-direction:column}.controls{display:block}.visual-stage{min-height:0}.anatomy-svg{width:100%;min-height:0}.organ-label{font-size:14px}.minor-label{font-size:11px}.bottom-grid{grid-template-columns:1fr}.pathway{grid-template-columns:1fr}.buttons{grid-template-columns:1fr 1fr 1fr}.dish-grid{grid-template-columns:1fr 1fr}.stage-list{grid-template-columns:repeat(3,1fr)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Refinement pass: original, layered atlas artwork and tactile UI */
+:root{--bg:#060e12;--panel:#0b191e;--panel2:#10242a;--ink:#f1f7f4;--muted:#a0b5b2;--line:#31474a;--mint:#a5f2d2;--cyan:#a4eaf4;--coral:#f4a18e;--gold:#f3d49a}
+body{background:radial-gradient(ellipse at 50% -15%,#173037 0%,#081317 47%,#050b0e 100%);letter-spacing:.005em}
+.shell{max-width:1540px;padding:20px clamp(12px,2.2vw,32px) 34px}
+.topbar{border-bottom-color:#b3e8de20}
+.brand{letter-spacing:.22em}.brand span{color:#a5f2d2}
+.return,.time-chip,.visual,.panel{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.return{transition:background .22s,border-color .22s,transform .22s,color .22s}
+.return:hover{background:#a5f2d214;border-color:#a5f2d277;transform:translateY(-1px)}
+h1{font-weight:720;letter-spacing:-.065em}
+.intro p{font-size:12.5px;max-width:650px}
+.visual,.panel{border-color:#c5e5de20;background:linear-gradient(145deg,#102126ed,#091317f5);box-shadow:0 18px 55px #00000016,inset 0 1px #ffffff08}
+.visual-head{background:linear-gradient(90deg,#ffffff04,transparent);padding:15px 18px}
+.visual-stage{background:radial-gradient(ellipse at 51% 37%,#1a3436 0%,#0d1c21 54%,#071014 100%)}
+.anatomy-svg{filter:drop-shadow(0 8px 28px #00000016)}
+.body-sil{fill:#a4eaf4;fill-opacity:.055;stroke:#b5edf2;stroke-opacity:.38;stroke-width:1.65}
+.body-detail{stroke:#c4eff0;stroke-opacity:.20;stroke-width:1.15}
+.organ{stroke:#ffd9c9;stroke-opacity:.68;stroke-width:1.3;vector-effect:non-scaling-stroke;transition:filter .24s ease,opacity .24s ease,stroke .24s ease,stroke-width .24s ease}
+.organ:hover,.organ.selected{filter:drop-shadow(0 0 8px #a5f2d277) brightness(1.08);stroke:#f2fff9;stroke-opacity:1;stroke-width:2.2}
+.organ:focus-visible{outline:none;stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px #a5f2d2)}
+.liver{fill:url(#liverShade);fill-opacity:.94}
+.stomach{fill:url(#stomachShade);fill-opacity:.96}
+.pancreas{fill:url(#pancreasShade);fill-opacity:.98}
+.gall{fill:url(#gallShade);fill-opacity:.98}
+.intestinal-wall{stroke:url(#wallShade);stroke-opacity:.9;stroke-width:26}
+.intestinal-lumen{stroke:#ffdec8;stroke-opacity:.84;stroke-width:13}
+.small-wall{stroke:url(#wallShade);stroke-opacity:.92;stroke-width:17}
+.small-lumen{stroke:#ffe5d2;stroke-opacity:.93;stroke-width:7.5}
+.esophagus-wall{stroke:url(#wallShade);stroke-opacity:.95;stroke-width:16}
+.esophagus-lumen{stroke:#ffe7d6;stroke-opacity:.95;stroke-width:6.5}
+.duct{stroke:#f4dc9c;stroke-width:2.6}
+.vessel{stroke:#ff8e99;stroke-width:2.7}.lymph{stroke:#a5f2d2;stroke-width:2.7}
+.organ-label{font-size:11px;font-weight:650;letter-spacing:.015em;fill:#e0ece7;stroke:#081215;stroke-width:3.5px}
+.minor-label{font-size:9px;fill:#a0b7b0;stroke:#081215;stroke-width:3px}
+.label-line{stroke:#b5d4cb;stroke-opacity:.55}
+.flow-particle{filter:drop-shadow(0 0 6px #f5d58b88)}
+#bolusHalo{transition:r .16s ease,opacity .16s ease}
+.dish{position:relative;overflow:hidden;transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,background .22s,box-shadow .22s}
+.dish:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,#ffffff08,transparent 42%);opacity:0;transition:opacity .22s;pointer-events:none}
+.dish:hover{transform:translateY(-2px);box-shadow:0 7px 18px #00000020}
+.dish:hover:before,.dish.active:before{opacity:1}
+.dish:active{transform:translateY(0) scale(.985)}
+.dish.active{box-shadow:inset 0 0 0 1px #a5f2d211,0 0 0 1px #a5f2d20b}
+.action{transition:transform .18s cubic-bezier(.2,.8,.2,1),background .18s,border-color .18s,box-shadow .18s}
+.action:hover:not(:disabled){transform:translateY(-1px);border-color:#a5f2d288;box-shadow:0 5px 16px #00000022}
+.action:active:not(:disabled){transform:translateY(1px) scale(.985)}
+.action.primary:hover:not(:disabled){background:#c1f8df;box-shadow:0 5px 20px #a5f2d21d}
+button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.track{background:#213331;box-shadow:inset 0 1px 2px #00000040}
+.track i{background:linear-gradient(90deg,#84dfc5,#a5f2d2 62%,#f3d49a);box-shadow:0 0 10px #a5f2d22b}
+.stage-pill{transition:color .24s,border-color .24s,background .24s,transform .24s}
+.stage-pill.active{box-shadow:inset 0 0 0 1px #a5f2d20a}
+.explain,.meal-summary,.time-card,.pathway div{box-shadow:inset 0 1px #ffffff05}
+.explain{transition:border-color .24s,background .24s}
+.time-card{transition:transform .22s,border-color .22s}
+.time-card:hover{transform:translateY(-2px);border-color:#b3e8de35}
+@media(max-width:620px){.organ-label{font-size:13px}.minor-label{font-size:10px}.visual-head span{line-height:1.6}}
+@media(prefers-reduced-motion:reduce){.dish,.action,.return,.time-card{transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -25,7 +85,11 @@
 <defs>
 <linearGradient id="skin" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#9ce9f4" stop-opacity=".11"/><stop offset="1" stop-color="#9ce9f4" stop-opacity=".025"/></linearGradient>
 <linearGradient id="liverShade" x1="0" x2="1"><stop stop-color="#d97a63"/><stop offset="1" stop-color="#8e3e39"/></linearGradient>
-<linearGradient id="gutShade" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e9b09b" stop-opacity=".9"/><stop offset="1" stop-color="#b66d68" stop-opacity=".82"/></linearGradient>
+<linearGradient id="gutShade" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f0b8a1" stop-opacity=".96"/><stop offset=".48" stop-color="#d48a80" stop-opacity=".94"/><stop offset="1" stop-color="#9e5a5c" stop-opacity=".92"/></linearGradient>
+<linearGradient id="stomachShade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5b0b0"/><stop offset=".45" stop-color="#d9818d"/><stop offset="1" stop-color="#a9586d"/></linearGradient>
+<linearGradient id="pancreasShade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4d29a"/><stop offset=".55" stop-color="#d5a56d"/><stop offset="1" stop-color="#a77b4f"/></linearGradient>
+<linearGradient id="gallShade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c6d98a"/><stop offset="1" stop-color="#72965a"/></linearGradient>
+<linearGradient id="wallShade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f2c1a9"/><stop offset=".5" stop-color="#d88d81"/><stop offset="1" stop-color="#a96061"/></linearGradient>
 <filter id="softGlow"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>
 <!-- body silhouette and landmarks -->
@@ -34,6 +98,10 @@
 <path class="body-sil" fill="url(#skin)" d="M352 130 L350 151 Q313 151 285 171 L234 200 Q219 210 224 235 L258 342 Q264 357 277 351 L291 344 L307 276 L313 351 Q304 382 294 415 Q285 447 300 483 L321 531 L316 661 Q316 696 339 700 Q360 700 361 673 L373 544 L387 544 L399 673 Q400 700 421 700 Q444 696 444 661 L439 531 L460 483 Q475 447 466 415 Q456 382 447 351 L453 276 L469 344 L483 351 Q496 357 502 342 L536 235 Q541 210 526 200 L475 171 Q447 151 410 151 L408 130Z"/>
 <path class="body-detail" d="M350 151 Q380 165 410 151 M313 180 Q380 204 447 180 M306 278 Q380 302 454 278 M300 483 Q380 507 460 483 M321 531 Q380 550 439 531 M380 168 V525"/>
 <path class="body-detail" d="M350 130 Q380 144 410 130 M353 150 L353 177 M407 150 L407 177"/>
+<path class="body-detail" d="M277 218 Q303 205 330 211 M483 218 Q457 205 430 211 M283 235 Q308 224 331 231 M477 235 Q452 224 429 231 M292 255 Q313 247 333 252 M468 255 Q447 247 427 252" />
+<path class="body-detail" d="M333 190 Q343 200 352 204 M427 190 Q417 200 408 204 M327 367 Q345 379 359 376 M433 367 Q415 379 401 376 M324 392 Q346 401 360 398 M436 392 Q414 401 400 398 M322 415 Q344 423 360 419 M438 415 Q416 423 400 419" />
+<path class="body-detail" d="M326 457 Q315 470 326 483 M434 457 Q445 470 434 483 M326 495 Q315 508 326 521 M434 495 Q445 508 434 521 M326 533 Q315 546 326 559 M434 533 Q445 546 434 559" />
+<path class="body-detail" d="M323 616 Q341 626 357 621 M437 616 Q419 626 403 621 M333 656 Q346 663 357 657 M427 656 Q414 663 403 657" />
 </g>
 <!-- esophagus, lumen is visibly lighter than its semi-transparent wall -->
 <path class="esophagus-wall organ" fill="none" tabindex="0" role="button" aria-label="Esophagus" data-organ="esophagus" d="M378 184 C374 218 383 245 379 269 C375 291 384 309 392 329"/>
@@ -41,11 +109,17 @@
 <!-- liver, gallbladder, stomach -->
 <path class="organ liver" tabindex="0" role="button" aria-label="Liver" data-organ="liver" d="M302 284 C313 252 356 250 389 266 C414 279 433 273 454 285 C469 298 449 326 425 340 C396 356 348 345 317 331 C303 325 294 306 302 284Z" fill="url(#liverShade)"/>
 <path d="M376 267 Q365 292 379 318 Q391 331 406 338" fill="none" stroke="#f4b19b" stroke-opacity=".5" stroke-width="2" pointer-events="none"/>
+<path d="M313 283 C328 265 350 263 370 272 C388 280 404 279 420 287" fill="none" stroke="#f6b09a" stroke-width="3" stroke-opacity=".55" pointer-events="none"/>
+<path d="M319 317 Q346 332 371 330 M385 291 Q397 304 392 319 M409 293 Q427 300 438 294" fill="none" stroke="#753c39" stroke-width="2" stroke-opacity=".34" stroke-linecap="round" pointer-events="none"/>
+<path d="M332 277 Q352 270 367 280 M342 321 Q357 326 369 322" fill="none" stroke="#ffcfb8" stroke-width="1.3" stroke-opacity=".5" pointer-events="none"/>
 <path class="organ gall" tabindex="0" role="button" aria-label="Gallbladder" data-organ="gallbladder" d="M399 328 C414 326 422 339 417 353 C413 367 402 379 397 367 C393 355 390 338 399 328Z"/>
 <path class="organ stomach" tabindex="0" role="button" aria-label="Stomach" data-organ="stomach" d="M398 306 C416 300 440 313 443 333 C447 351 431 364 429 385 C428 405 408 414 392 403 C378 393 379 372 386 354 C392 340 387 317 398 306Z"/>
 <path d="M398 319 Q417 333 414 350 Q412 367 401 383" fill="none" stroke="#ffe1db" stroke-opacity=".55" stroke-width="2" pointer-events="none"/>
+<path d="M398 322 C408 327 412 334 410 343 M394 339 Q404 345 405 354 M389 355 Q399 360 400 369 M389 374 Q398 380 398 389 M402 397 Q411 393 415 386" fill="none" stroke="#8d4b61" stroke-opacity=".58" stroke-width="2" stroke-linecap="round" pointer-events="none"/>
+<path d="M407 315 Q429 320 435 340 M431 352 Q424 362 420 374" fill="none" stroke="#ffe4d9" stroke-opacity=".48" stroke-width="1.5" pointer-events="none"/>
 <!-- pancreas and bile/pancreatic ducts -->
 <path class="organ pancreas" tabindex="0" role="button" aria-label="Pancreas" data-organ="pancreas" d="M363 390 C382 378 414 382 433 391 C448 398 438 409 421 407 C401 405 386 416 367 410 C355 406 352 398 363 390Z"/>
+<path d="M366 394 Q377 389 385 394 M389 400 Q401 392 411 398 M374 405 Q384 400 391 405 M414 402 L427 399" fill="none" stroke="#fff0ca" stroke-opacity=".58" stroke-width="1.4" stroke-linecap="round" pointer-events="none"/>
 <path class="duct" d="M400 397 C414 388 421 380 422 365 M400 397 Q407 391 411 381"/>
 <!-- stomach outlet and duodenum -->
 <path class="intestinal-wall organ" tabindex="0" role="button" aria-label="Duodenum" data-organ="duodenum" d="M430 391 C459 400 461 427 445 440 C429 453 404 443 404 426"/>
@@ -168,7 +242,7 @@ let selectedDish="oatmeal",elapsed=0,running=false,finished=false,lastFrame=0,ra
 const $=id=>document.getElementById(id);
 function selectDish(key){selectedDish=key;const d=dishes[key];document.querySelectorAll(".dish").forEach(b=>b.classList.toggle("active",b.dataset.dish===key));$("mealName").textContent=d.name;$("mealDesc").textContent=d.desc;$("mealTags").innerHTML=d.tags.map(t=>'<span class="tag">'+t+'</span>').join("");$("bolus").setAttribute("fill",d.color);$("bolusCore").setAttribute("fill","#fff6d4");resetSimulation(false)}
 document.querySelectorAll(".dish").forEach(b=>b.addEventListener("click",()=>selectDish(b.dataset.dish)));
-function pointAt(t){const pts=[{x:378,y:184},{x:378,y:226},{x:380,y:268},{x:392,y:328},{x:416,y:343},{x:425,y:381},{x:435,y:412},{x:403,y:431},{x:333,y:446},{x:389,y:454},{x:423,y:477},{x:337,y:490},{x:369,y:510},{x:426,y:525},{x:359,y:532},{x:420,y:563},{x:383,y:580},{x:346,y:601},{x:380,y:642},{x:382,y:654}];const scaled=t*(pts.length-1),i=Math.min(pts.length-2,Math.floor(scaled)),f=scaled-i;return{x:pts[i].x+(pts[i+1].x-pts[i].x)*f,y:pts[i].y+(pts[i+1].y-pts[i].y)*f}}
+function pointAt(t){const pts=[{x:378,y:184},{x:378,y:226},{x:380,y:268},{x:392,y:328},{x:416,y:343},{x:425,y:381},{x:435,y:412},{x:403,y:431},{x:333,y:446},{x:389,y:454},{x:423,y:477},{x:337,y:490},{x:369,y:510},{x:426,y:525},{x:359,y:532},{x:420,y:563},{x:383,y:580},{x:346,y:601},{x:380,y:642},{x:382,y:654}];const scaled=Math.max(0,Math.min(1,t))*(pts.length-1),i=Math.min(pts.length-2,Math.floor(scaled)),u=scaled-i,p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];const smooth=(a,b,c,d)=>.5*((2*b)+(-a+c)*u+(2*a-5*b+4*c-d)*u*u+(-a+3*b-3*c+d)*u*u*u);return{x:smooth(p0.x,p1.x,p2.x,p3.x),y:smooth(p0.y,p1.y,p2.y,p3.y)}}
 function updateFood(t){const p=pointAt(t);$("foodMarker").setAttribute("transform",`translate(${p.x} ${p.y})`);const stage=stages.findIndex(s=>t>=s.from&&t<s.to);const idx=t>=1?5:Math.max(0,stage);const d=dishes[selectedDish];const size=t<.23?d.r:t<.45?7:t<.76?5:t<.94?4:3;const shapes=["M-7 -4 L-3 -8 L3 -6 L7 -2 L5 5 L0 7 L-6 3Z","M-5 -7 Q4 -8 5 0 Q4 7 -3 6 Q-7 2 -5 -7Z","M-7 -3 Q-4 -8 1 -5 Q8 -7 7 0 Q6 7 0 5 Q-7 8 -7 -3Z","M-5 -4 C-2 -7 2 -6 4 -3 C7 1 2 5 -1 3 C-5 5 -7 0 -5 -4Z","M-7 -2 Q-6 -6 0 -5 Q6 -6 7 0 Q5 5 0 4 Q-6 5 -7 -2Z","M-7 0 Q-9 -4 -4 -5 Q1 -7 3 -3 Q8 -2 7 2 Q5 5 0 4 Q-5 6 -7 0Z"];$("bolus").setAttribute("d",shapes[idx]);$("bolus").setAttribute("transform",`scale(${size/8})`);$("bolusHalo").setAttribute("r",size+6);$("bolusCore").setAttribute("r",Math.max(1.5,size*.38));$("absorbLayer").classList.toggle("active",t>=.45&&t<.94);drawNutrients(t);setStage(idx)}
 function drawNutrients(t){const g=$("nutrientParticles");g.innerHTML="";if(t<.45||t>.94)return;const p=pointAt(t);for(let i=0;i<8;i++){const x=p.x+(i%4-1.5)*8,y=p.y+Math.floor(i/4)*8;const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",i%3===0?3.2:2.2);c.setAttribute("fill",i%3===0?"#ff8e92":"#9df2ce");c.setAttribute("opacity",.9);g.appendChild(c)}}
 function setStage(i){const s=stages[i];document.querySelectorAll(".stage-pill").forEach((el,j)=>{el.classList.toggle("active",j===i);el.classList.toggle("done",j<i)});$("stageTitle").textContent=s.title;$("stageCopy").textContent=s.copy;$("stageFact").textContent=s.fact;$("stageClock").textContent=s.range}
