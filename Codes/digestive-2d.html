@@ -71,6 +71,23 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offse
 @media(max-width:620px){.organ-label{font-size:13px}.minor-label{font-size:10px}.visual-head span{line-height:1.6}}
 @media(prefers-reduced-motion:reduce){.dish,.action,.return,.time-card{transition:none!important}}
 
+/* Fit the complete anatomical figure at every breakpoint; never crop the lower tract. */
+.visual-stage{min-height:0;height:auto;overflow:visible;padding:8px 8px 12px}
+.anatomy-svg{display:block;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:760/800;overflow:visible}
+.visual{overflow:visible}
+.organ{filter:drop-shadow(0 2px 2px #0008) drop-shadow(-1px -1px 2px #ffe4ce20)}
+.liver{filter:drop-shadow(0 3px 4px #0008) drop-shadow(-2px -2px 4px #ffc5ad24)}
+.stomach{filter:drop-shadow(0 3px 4px #0008) drop-shadow(-2px -2px 4px #ffe4e033)}
+.pancreas,.gall{filter:drop-shadow(0 2px 3px #0009) drop-shadow(-1px -1px 3px #fff0c533)}
+.intestinal-wall{filter:drop-shadow(0 2px 2px #0009)}
+.small-wall{filter:drop-shadow(0 2px 2px #0009)}
+.visual-stage.drag-over{outline:2px dashed var(--mint);outline-offset:-8px;background:radial-gradient(ellipse at 50% 40%,#234941 0,#0b191c 65%,#081215 100%)}
+.dish{cursor:grab}
+.dish:active{cursor:grabbing}
+.dish[draggable="true"]{user-select:none;-webkit-user-drag:element}
+.drag-hint{font-size:9px;color:#a5f2d2;margin:0 0 10px;line-height:1.5}
+@media(max-width:980px){.visual-stage{padding:4px 4px 8px}.anatomy-svg{max-height:none}}
+@media(max-width:620px){.visual-stage{padding:0 0 6px}.anatomy-svg{width:100%;max-height:none}}
 </style>
 </head>
 <body>
@@ -80,7 +97,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offse
 <main class="layout">
 <section class="visual" aria-label="Interactive front-view anatomy">
 <div class="visual-head"><b>HUMAN DIGESTIVE SYSTEM</b><span>FRONT VIEW · SELECT AN ORGAN TO INSPECT</span></div>
-<div class="visual-stage">
+<div class="visual-stage" id="dropZone" aria-label="Drop a dish here to start the digestive journey">
 <svg id="anatomy" class="anatomy-svg" viewBox="0 0 760 800" role="img" aria-label="Front-view translucent body silhouette with clickable digestive organs">
 <defs>
 <linearGradient id="skin" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#9ce9f4" stop-opacity=".11"/><stop offset="1" stop-color="#9ce9f4" stop-opacity=".025"/></linearGradient>
@@ -173,7 +190,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--mint);outline-offse
 <div class="view-legend"><span class="legend-item"><i class="swatch" style="background:#d9958c"></i>Semi-transparent tract wall</span><span class="legend-item"><i class="swatch" style="background:#ffe1c9"></i>Visible lumen / food path</span><span class="legend-item"><i class="swatch" style="background:#ff8e92"></i>Blood pathway</span><span class="legend-item"><i class="swatch" style="background:#9df2ce"></i>Lymph pathway</span></div>
 </section>
 <aside class="panel controls">
-<section class="food-section"><h2 class="section-label">01 / Choose a dish</h2><div class="dish-grid" id="dishGrid">
+<section class="food-section"><h2 class="section-label">01 / Choose a dish</h2><p class="drag-hint">Drag any dish onto the anatomy to select it and start the journey, or click to select.</p><div class="dish-grid" id="dishGrid">
 <button class="dish active" data-dish="oatmeal"><span class="emoji">🥣</span><span><b>Oatmeal with berries</b><small>Carbs · soluble fiber</small></span></button>
 <button class="dish" data-dish="chickenRice"><span class="emoji">🍚</span><span><b>Chicken and rice</b><small>Starch · protein</small></span></button>
 <button class="dish" data-dish="lentilCurry"><span class="emoji">🍛</span><span><b>Lentil curry</b><small>Fiber · plant protein</small></span></button>
@@ -241,11 +258,47 @@ const stages=[
 let selectedDish="oatmeal",elapsed=0,running=false,finished=false,lastFrame=0,raf=0,selectedOrgan=null;
 const $=id=>document.getElementById(id);
 function selectDish(key){selectedDish=key;const d=dishes[key];document.querySelectorAll(".dish").forEach(b=>b.classList.toggle("active",b.dataset.dish===key));$("mealName").textContent=d.name;$("mealDesc").textContent=d.desc;$("mealTags").innerHTML=d.tags.map(t=>'<span class="tag">'+t+'</span>').join("");$("bolus").setAttribute("fill",d.color);$("bolusCore").setAttribute("fill","#fff6d4");resetSimulation(false)}
-document.querySelectorAll(".dish").forEach(b=>b.addEventListener("click",()=>selectDish(b.dataset.dish)));
-function pointAt(t){const pts=[{x:378,y:184},{x:378,y:226},{x:380,y:268},{x:392,y:328},{x:416,y:343},{x:425,y:381},{x:435,y:412},{x:403,y:431},{x:333,y:446},{x:389,y:454},{x:423,y:477},{x:337,y:490},{x:369,y:510},{x:426,y:525},{x:359,y:532},{x:420,y:563},{x:383,y:580},{x:346,y:601},{x:380,y:642},{x:382,y:654}];const scaled=Math.max(0,Math.min(1,t))*(pts.length-1),i=Math.min(pts.length-2,Math.floor(scaled)),u=scaled-i,p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];const smooth=(a,b,c,d)=>.5*((2*b)+(-a+c)*u+(2*a-5*b+4*c-d)*u*u+(-a+3*b-3*c+d)*u*u*u);return{x:smooth(p0.x,p1.x,p2.x,p3.x),y:smooth(p0.y,p1.y,p2.y,p3.y)}}
+document.querySelectorAll(".dish").forEach(b=>{
+ b.draggable=true;
+ b.addEventListener("click",()=>selectDish(b.dataset.dish));
+ b.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",b.dataset.dish);e.dataTransfer.effectAllowed="copy";});
+});
+const dropZone=$("dropZone");
+dropZone.addEventListener("dragover",e=>{e.preventDefault();e.dataTransfer.dropEffect="copy";dropZone.classList.add("drag-over")});
+dropZone.addEventListener("dragleave",e=>{if(!dropZone.contains(e.relatedTarget))dropZone.classList.remove("drag-over")});
+dropZone.addEventListener("drop",e=>{
+ e.preventDefault();dropZone.classList.remove("drag-over");
+ const key=e.dataTransfer.getData("text/plain");
+ if(!Object.prototype.hasOwnProperty.call(dishes,key))return;
+ selectDish(key);start();
+});
+function pointAt(t){
+/* Time-keyed landmarks follow the anatomical lumen, including the full colon loop. */
+const pts=[
+{t:0,x:378,y:184},{t:.055,x:378,y:226},{t:.11,x:380,y:268},
+{t:.16,x:392,y:328},{t:.205,x:416,y:343},{t:.235,x:433,y:390},
+{t:.275,x:445,y:438},{t:.32,x:385,y:446},{t:.36,x:334,y:446},
+{t:.40,x:389,y:454},{t:.44,x:423,y:477},{t:.48,x:337,y:490},
+{t:.52,x:369,y:510},{t:.56,x:426,y:525},{t:.60,x:359,y:532},
+{t:.64,x:420,y:563},{t:.68,x:383,y:580},{t:.72,x:346,y:601},
+{t:.755,x:418,y:613},
+/* ileum into cecum, then ascending, transverse, descending and sigmoid colon */
+{t:.765,x:329,y:581},{t:.78,x:310,y:570},{t:.805,x:294,y:535},
+{t:.83,x:293,y:480},{t:.85,x:294,y:445},{t:.875,x:330,y:427},
+{t:.89,x:380,y:423},{t:.905,x:430,y:427},{t:.92,x:466,y:450},
+{t:.935,x:467,y:500},{t:.95,x:465,y:552},{t:.963,x:444,y:579},
+{t:.975,x:418,y:590},{t:.986,x:394,y:606},{t:.994,x:382,y:630},{t:1,x:382,y:654}
+];
+t=Math.max(0,Math.min(1,t));
+let i=0;while(i<pts.length-2&&t>pts[i+1].t)i++;
+const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+const u=(t-p1.t)/(p2.t-p1.t),u2=u*u,u3=u2*u;
+const smooth=(a,b,c,d)=>.5*((2*b)+(-a+c)*u+(2*a-5*b+4*c-d)*u2+(-a+3*b-3*c+d)*u3);
+return{x:smooth(p0.x,p1.x,p2.x,p3.x),y:smooth(p0.y,p1.y,p2.y,p3.y)};
+}
 function updateFood(t){const p=pointAt(t);$("foodMarker").setAttribute("transform",`translate(${p.x} ${p.y})`);const stage=stages.findIndex(s=>t>=s.from&&t<s.to);const idx=t>=1?5:Math.max(0,stage);const d=dishes[selectedDish];const size=t<.23?d.r:t<.45?7:t<.76?5:t<.94?4:3;const shapes=["M-7 -4 L-3 -8 L3 -6 L7 -2 L5 5 L0 7 L-6 3Z","M-5 -7 Q4 -8 5 0 Q4 7 -3 6 Q-7 2 -5 -7Z","M-7 -3 Q-4 -8 1 -5 Q8 -7 7 0 Q6 7 0 5 Q-7 8 -7 -3Z","M-5 -4 C-2 -7 2 -6 4 -3 C7 1 2 5 -1 3 C-5 5 -7 0 -5 -4Z","M-7 -2 Q-6 -6 0 -5 Q6 -6 7 0 Q5 5 0 4 Q-6 5 -7 -2Z","M-7 0 Q-9 -4 -4 -5 Q1 -7 3 -3 Q8 -2 7 2 Q5 5 0 4 Q-5 6 -7 0Z"];$("bolus").setAttribute("d",shapes[idx]);$("bolus").setAttribute("transform",`scale(${size/8})`);$("bolusHalo").setAttribute("r",size+6);$("bolusCore").setAttribute("r",Math.max(1.5,size*.38));$("absorbLayer").classList.toggle("active",t>=.45&&t<.94);drawNutrients(t);setStage(idx)}
 function drawNutrients(t){const g=$("nutrientParticles");g.innerHTML="";if(t<.45||t>.94)return;const p=pointAt(t);for(let i=0;i<8;i++){const x=p.x+(i%4-1.5)*8,y=p.y+Math.floor(i/4)*8;const c=document.createElementNS("http://www.w3.org/2000/svg","circle");c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",i%3===0?3.2:2.2);c.setAttribute("fill",i%3===0?"#ff8e92":"#9df2ce");c.setAttribute("opacity",.9);g.appendChild(c)}}
-function setStage(i){const s=stages[i];document.querySelectorAll(".stage-pill").forEach((el,j)=>{el.classList.toggle("active",j===i);el.classList.toggle("done",j<i)});$("stageTitle").textContent=s.title;$("stageCopy").textContent=s.copy;$("stageFact").textContent=s.fact;$("stageClock").textContent=s.range}
+function setStage(i){const s=stages[Math.max(0,Math.min(stages.length-1,i))];document.querySelectorAll(".stage-pill").forEach((el,j)=>{el.classList.toggle("active",j===i);el.classList.toggle("done",j<i)});$("stageTitle").textContent=s.title;$("stageCopy").textContent=s.copy;$("stageFact").textContent=s.fact;$("stageClock").textContent=s.range}
 function renderProgress(){const t=Math.min(1,elapsed/30);$("elapsed").textContent=Math.floor(elapsed*10)/10+" / 30 sec";$("overallBar").style.width=(t*100)+"%";$("digestionPct").textContent=Math.round(Math.min(1,t*1.08)*100)+"%";$("digestionBar").style.width=(Math.min(1,t*1.08)*100)+"%";$("transitPct").textContent=Math.round(t*100)+"%";$("transitBar").style.width=(t*100)+"%";updateFood(t)}
 function frame(now){if(!running)return;if(!lastFrame)lastFrame=now;const delta=Math.min((now-lastFrame)/1000,.1);lastFrame=now;elapsed=Math.min(30,elapsed+delta);renderProgress();if(elapsed>=30){running=false;finished=true;$("eat").textContent="↻ Replay journey";$("pause").disabled=true;$("pause").textContent="Ⅱ Pause";$("stageTitle").textContent="Journey complete";$("stageCopy").textContent="The 30-second teaching sequence is complete. Real digestion and transit are not complete in 30 seconds; the timing cards show approximate biological times.";raf=0;return}raf=requestAnimationFrame(frame)}
 function start(){if(running){elapsed=0;lastFrame=0;renderProgress();return}if(finished||elapsed>=30){elapsed=0;finished=false}running=true;lastFrame=0;$("eat").textContent="↻ Restart journey";$("pause").disabled=false;$("pause").textContent="Ⅱ Pause";raf=requestAnimationFrame(frame)}
