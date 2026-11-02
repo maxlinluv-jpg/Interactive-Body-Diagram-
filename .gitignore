@@ -1,0 +1,21 @@
+# Large source/export models not used by the active GitHub Pages exhibit
+Assets_3D/Anatomy_scene.glb
+Assets_3D/Anatomy_scene_optimized.glb
+
+# Archived and local development material
+Archive/
+.agents/
+.codex/
+.aws/
+.vscode/
+skills-lock.json
+glb-test.html
+Capstone_test.py
+
+# Local tooling and generated files
+node_modules/
+*.log
+*.tmp
+*.temp
+Thumbs.db
+Desktop.ini
